@@ -1,8 +1,9 @@
 use std::{path::PathBuf, str::FromStr};
 
-use color_eyre::eyre::eyre;
 use lazy_regex::regex_captures;
 use strum::EnumString;
+
+use crate::error::RecordParseError;
 
 #[derive(Debug, PartialEq)]
 pub enum SphinxPriority {
@@ -13,7 +14,7 @@ pub enum SphinxPriority {
 }
 
 impl TryFrom<&str> for SphinxPriority {
-    type Error = color_eyre::Report;
+    type Error = RecordParseError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
@@ -21,7 +22,7 @@ impl TryFrom<&str> for SphinxPriority {
             "1" => Ok(SphinxPriority::Standard),
             "0" => Ok(SphinxPriority::High),
             "2" => Ok(SphinxPriority::Low),
-            _ => Err(eyre!("Unknown Priority: {}", value)),
+            _ => Err(RecordParseError::InvalidRowPriority(value.to_string())),
         }
     }
 }
@@ -34,11 +35,11 @@ pub enum SphinxType {
     Cpp(CppRole),
     JavaScript(JsRole),
     Mathematics(MathRole),
-    ReStructuredText(RstRole),
+    // ReStructuredText(RstRole),
 }
 
 impl TryFrom<&str> for SphinxType {
-    type Error = color_eyre::Report;
+    type Error = RecordParseError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value.split_once(":") {
@@ -49,10 +50,10 @@ impl TryFrom<&str> for SphinxType {
                 "py" => Ok(SphinxType::Python(PyRole::from_str(role)?)),
                 "js" => Ok(SphinxType::JavaScript(JsRole::from_str(role)?)),
                 "math" => Ok(SphinxType::Mathematics(MathRole::from_str(role)?)),
-                "rst" => Ok(SphinxType::ReStructuredText(RstRole::from_str(role)?)),
-                _ => Err(eyre!("Unknown domain: {}", domain)),
+                // "rst" => Ok(SphinxType::ReStructuredText(RstRole::from_str(role)?)),
+                _ => Err(RecordParseError::InvalidDomain(domain.to_string())),
             },
-            None => Err(eyre!("sphinx ref type did not contain :")),
+            None => Err(RecordParseError::MalformedDomainField(value.to_string())),
         }
     }
 }
@@ -119,9 +120,10 @@ pub enum PyRole {
     Property,
     Class,
 }
-#[derive(Debug, PartialEq, EnumString)]
-#[strum(serialize_all = "camelCase")]
-pub enum RstRole {}
+
+// #[derive(Debug, PartialEq, EnumString)]
+// #[strum(serialize_all = "camelCase")]
+// pub enum RstRole {}
 
 #[derive(Debug)]
 pub struct ExternalSphinxRef {
@@ -134,7 +136,7 @@ pub struct ExternalSphinxRef {
 }
 
 impl TryFrom<&str> for ExternalSphinxRef {
-    type Error = color_eyre::Report;
+    type Error = RecordParseError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         if let Some((_whole, name, sphinx_type, priority, location, dispname)) =
@@ -154,7 +156,7 @@ impl TryFrom<&str> for ExternalSphinxRef {
                 dispname: display_name,
             })
         } else {
-            Err(eyre!("failed to parse line"))
+            Err(RecordParseError::MalformedRecord(value.to_string()))
         }
     }
 }
@@ -164,12 +166,11 @@ pub type RelPath = PathBuf;
 
 #[cfg(test)]
 mod test {
-    use color_eyre::Result;
 
     use super::*;
 
     #[test]
-    fn test_sphinx_type_parsing_c() -> Result<()> {
+    fn test_sphinx_type_parsing_c() -> Result<(), RecordParseError> {
         assert_eq!(SphinxType::try_from("c:enum")?, SphinxType::C(CRole::Enum));
         assert_eq!(
             SphinxType::try_from("c:enumerator")?,
@@ -204,7 +205,7 @@ mod test {
         Ok(())
     }
     #[test]
-    fn test_sphinx_type_parsing_cpp() -> Result<()> {
+    fn test_sphinx_type_parsing_cpp() -> Result<(), RecordParseError> {
         assert_eq!(
             SphinxType::try_from("cpp:class")?,
             SphinxType::Cpp(CppRole::Class)
@@ -228,7 +229,7 @@ mod test {
         Ok(())
     }
     #[test]
-    fn test_sphinx_type_parsing_math() -> Result<()> {
+    fn test_sphinx_type_parsing_math() -> Result<(), RecordParseError> {
         assert_eq!(
             SphinxType::try_from("math:numref")?,
             SphinxType::Mathematics(MathRole::Numref)
@@ -236,7 +237,7 @@ mod test {
         Ok(())
     }
     #[test]
-    fn test_sphinx_type_parsing_js() -> Result<()> {
+    fn test_sphinx_type_parsing_js() -> Result<(), RecordParseError> {
         assert_eq!(
             SphinxType::try_from("js:module")?,
             SphinxType::JavaScript(JsRole::Module)
@@ -260,7 +261,7 @@ mod test {
         Ok(())
     }
     #[test]
-    fn test_sphinx_type_parsing_py() -> Result<()> {
+    fn test_sphinx_type_parsing_py() -> Result<(), RecordParseError> {
         assert_eq!(
             SphinxType::try_from("py:attribute")?,
             SphinxType::Python(PyRole::Attribute)
@@ -296,7 +297,7 @@ mod test {
         Ok(())
     }
     #[test]
-    fn test_sphinx_type_parsing_std() -> Result<()> {
+    fn test_sphinx_type_parsing_std() -> Result<(), RecordParseError> {
         assert_eq!(
             SphinxType::try_from("std:doc")?,
             SphinxType::Std(StdRole::Doc)

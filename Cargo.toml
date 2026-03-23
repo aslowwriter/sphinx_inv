@@ -18,18 +18,15 @@ path = "src/lib.rs"
 
 
 [dependencies]
-color-eyre          = "0.6"
 strum               = { version = "0.28.0", features = ["derive", "strum_macros"] }
 tracing             = { version = "0", features = ["attributes"] }
 tracing-subscriber  = "0"
 tracing-error       = "0"
-clap                = { version = "4", features = ["derive", "unicode", "cargo"] }
-clap-verbosity-flag = { version = "3.0.4", features = ["tracing"] }
-
 
 serde = { version = "1", features = ["derive"] }
 lazy-regex = { version = "3.6.0", features = ["std"] }
 flate2 = "1.1.9"
+thiserror = "2.0.18"
 
 
 [dev-dependencies]
