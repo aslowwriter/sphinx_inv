@@ -18,25 +18,12 @@ path = "src/lib.rs"
 
 
 [dependencies]
-strum               = { version = "0.28.0", features = ["derive", "strum_macros"] }
-tracing             = { version = "0", features = ["attributes"] }
-tracing-subscriber  = "0"
-tracing-error       = "0"
-
-serde = { version = "1", features = ["derive"] }
-lazy-regex = { version = "3.6.0", features = ["std"] }
-flate2 = "1.1.9"
-thiserror = "2.0.18"
-
-
-[dev-dependencies]
-tempfile          = "3.27.0"
-pretty_assertions = "1"
-assert_fs = "1.1.3"
-
+flate2            = "1.1.9"
+thiserror         = "2.0.18"
+winnow            = { version = "1.0.0", features = ["simd"] }
 
 [profile.release]
-debug         = 0
+debug         = true
 lto           = "fat"
 codegen-units = 1
 strip         = "symbols"

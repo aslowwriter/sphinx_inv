@@ -2,8 +2,6 @@ use std::string::FromUtf8Error;
 
 use thiserror::Error;
 
-use crate::header::SphinxInvVersion;
-
 #[derive(Error, Debug)]
 pub enum SphinxInvError {
     #[error("IO error")]
@@ -13,10 +11,16 @@ pub enum SphinxInvError {
     Utf8ParseError(#[from] FromUtf8Error),
 
     #[error("Failed to parse line: {0}")]
-    ParseError(#[from] RecordParseError),
+    ParseError(String),
 
-    #[error("Failed to parse header: {0}")]
-    InvalidHeaderError(#[from] InvalidHeaderError),
+    #[error("Malformed Header")]
+    MalformedHeader,
+
+    #[error("Unsupported inventory version: {0}")]
+    UnsupportedInventoryVersion(u8),
+
+    #[error("Unsupported compression method: {0}")]
+    UnsupportedCompressionMethod(String),
 }
 
 #[derive(Error, Debug)]
@@ -28,26 +32,14 @@ pub enum RecordParseError {
     InvalidRowPriority(String),
 
     #[error("Invalid role: {0}")]
-    InvalidRole(#[from] strum::ParseError),
+    InvalidRole(String),
 
     #[error("Malformed domain field: {0}")]
     MalformedDomainField(String),
 
+    #[error("Malformed type: {0}")]
+    MalformedType(String),
+
     #[error("Malformed record: {0}")]
     MalformedRecord(String),
-}
-
-#[derive(Error, Debug)]
-pub enum InvalidHeaderError {
-    #[error("Invalid Sphinx Version")]
-    InvalidSphinxVerison(String),
-
-    #[error("Unsupported Sphinx Version")]
-    UnsupportedSphinxVersion(SphinxInvVersion),
-
-    #[error("IO error")]
-    IoError(#[from] std::io::Error),
-
-    #[error("Invalid compression method")]
-    InvalidCompressionMethod(String),
 }
