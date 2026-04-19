@@ -70,7 +70,9 @@ fn parse_compression_method(buffer: &mut &[u8]) -> WinnowResult<String> {
     .parse_next(buffer)
 }
 
-/// Parses the ascii header part of an inventory file. This must look like so:
+/// Parses the ascii header part of an inventory file.
+///
+/// This must look like so:
 /// ```txt
 /// # Sphinx inventory file 2
 /// # Project: <project display name>
