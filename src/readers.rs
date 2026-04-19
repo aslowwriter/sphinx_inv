@@ -1,4 +1,8 @@
-use std::io::{BufRead, BufReader, Lines};
+use std::{
+    fs::File,
+    io::{BufRead, BufReader, Lines},
+    path::Path,
+};
 
 use flate2::read::ZlibDecoder;
 
@@ -13,16 +17,17 @@ pub struct SphinxInventoryReader<R: std::io::Read> {
 }
 
 impl<R: std::io::Read> SphinxInventoryReader<R> {
-    /**
-    Construct a [`SphinxInventoryReader`] that wraps a impl [`std::io::Read`]
-    # Errors
-    This function can return Err when:
-    - An unsupported version format is mentinoed in the header (i.e. anything other than 2
-      currently)
-    - the body is compressed with anything besides zlib, or the last header line does not
-      mention zlib
-    - On any IO error while reading from the readaer
-    */
+    /// Construct a [`SphinxInventoryReader`] that wraps a impl [`std::io::Read`]
+    /// Note that constructing this struct WILL cause reads immediately. Upon creation
+    /// we will try to read and parse the header lines from the reader. This must succeed otherwise
+    /// an Err will be returned. Subsequent reads will return parsed body lines.
+    /// # Errors
+    /// This function can return Err when:
+    /// - An unsupported version format is mentinoed in the header (i.e. anything other than 2
+    ///   currently)
+    /// - the body is compressed with anything besides zlib, or the last header line does not
+    ///   mention zlib
+    /// - On any IO error while reading from the readaer
     pub fn from_reader(reader: R) -> Result<SphinxInventoryReader<R>, SphinxInvError> {
         let mut buffered_header_reader = BufReader::new(reader);
         let header = parse_header(&mut buffered_header_reader)?;
@@ -50,6 +55,22 @@ impl<R: std::io::Read> SphinxInventoryReader<R> {
 
     pub fn header(&self) -> &InventoryHeader {
         &self.header
+    }
+}
+
+impl SphinxInventoryReader<File> {
+    /// Construct a [`SphinxInventoryReader`] by reading the data from a [`std::path::Path`]
+    /// # Errors
+    /// This function can return Err when:
+    /// - An unsupported version format is mentinoed in the header (i.e. anything other than 2
+    ///   currently)
+    /// - the body is compressed with anything besides zlib, or the last header line does not
+    ///   mention zlib
+    /// - On any IO error while reading from the readaer
+    pub fn from_path<P: AsRef<Path>>(
+        path: P,
+    ) -> Result<SphinxInventoryReader<File>, SphinxInvError> {
+        SphinxInventoryReader::from_reader(File::open(path)?)
     }
 }
 
