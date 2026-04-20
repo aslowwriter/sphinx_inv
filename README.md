@@ -1,7 +1,7 @@
 # sphinx_inv
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![codecov](https://codecov.io/gh/savente93/sphinx_inv/branch/main/graph/badge.svg)](https://codecov.io/gh/savente93/sphinx_inv)
+[![codecov](https://codecov.io/gh/aslowwriter/sphinx_inv/branch/main/graph/badge.svg)](https://codecov.io/gh/savente93/sphinx_inv)
 [![crates.io](https://img.shields.io/crates/v/sphinx_inv)](https://crates.io/crates/sphinx_inv)
 [![Docs.rs](https://docs.rs/sphinx_inv/badge.svg)](https://docs.rs/sphinx_inv)
 
@@ -27,4 +27,4 @@ If you have to publish, or otherwise fiddle with dependencies of sphinx_inv you'
 
 ## Template
 
-This repo was initially setup using [`cargo-generate`](https://github.com/cargo-generate/cargo-generate) and [this template](https://github.com/savente93/rust-template)
+This repo was initially setup using [`cargo-generate`](https://github.com/cargo-generate/cargo-generate) and [this template](https://github.com/aslowwriter/rust-template)
