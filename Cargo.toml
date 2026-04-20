@@ -10,7 +10,7 @@ license      = "MIT"
 
 
 documentation = "https://docs.rs/sphinx_inv"
-repository    = "https://github.com/savente93/sphinx_inv"
+repository    = "https://github.com/aslowwriter/sphinx_inv"
 
 
 [lib]
