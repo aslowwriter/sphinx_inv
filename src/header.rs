@@ -11,7 +11,7 @@ use winnow::{
 
 use crate::error::{MalformedHeader, MissingHeaderComponent};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct InventoryHeader {
     pub project_name: String,
     pub project_version: String,

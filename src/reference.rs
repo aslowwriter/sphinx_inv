@@ -10,7 +10,7 @@ use winnow::{
     token::take_while,
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct SphinxReference {
     pub name: String,
     // type is a reserved keyword
