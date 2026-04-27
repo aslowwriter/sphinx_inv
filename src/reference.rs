@@ -5,7 +5,7 @@ use crate::{
 use winnow::{
     ModalResult, Parser,
     ascii::{digit1, space1, till_line_ending},
-    combinator::{alt, dispatch, fail, opt, preceded, repeat, repeat_till, terminated, trace},
+    combinator::{alt, dispatch, fail, opt, preceded, repeat_till, terminated, trace},
     stream::AsChar,
     token::take_while,
 };
@@ -106,15 +106,6 @@ pub fn reference(input: &mut &str) -> ModalResult<SphinxReference> {
         location,
         display_name,
     })
-}
-
-pub fn references(input: &mut &str) -> ModalResult<Vec<SphinxReference>> {
-    repeat(1.., trace("reference", reference))
-        .fold(Vec::new, |mut acc: Vec<_>, item| {
-            acc.push(item);
-            acc
-        })
-        .parse_next(input)
 }
 
 #[cfg(test)]

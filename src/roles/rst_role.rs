@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use winnow::{ModalResult, Parser, error::StrContext, stream::AsChar, token::take_till};
 
-use crate::roles::{RecordParseError, SphinxType};
+use crate::roles::{MalformedReference, SphinxType};
 
 /// Describes a RST role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `rst:{role}`
@@ -28,14 +28,14 @@ pub(crate) fn rst_role(input: &mut &str) -> ModalResult<SphinxType> {
     Ok(SphinxType::ReStructuredText(role))
 }
 impl FromStr for RstRole {
-    type Err = RecordParseError;
+    type Err = MalformedReference;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
             "directive:option" => Ok(RstRole::Option),
             "directive" => Ok(RstRole::Directive),
 
-            _ => Err(RecordParseError::InvalidRole(s.to_string())),
+            _ => Err(MalformedReference::InvalidRole(s.to_string())),
         }
     }
 }

@@ -1,13 +1,17 @@
+use std::io::BufRead;
+
+use winnow::prelude::*;
 use winnow::{
     Result as WinnowResult,
-    ascii::{line_ending, space0},
-    combinator::{delimited, terminated, trace},
+    combinator::{preceded, trace},
+    error::ContextError,
     stream::AsChar,
-    token::{take, take_till, take_while},
+    token::{rest, take, take_till, take_until, take_while},
 };
-use winnow::{ascii::till_line_ending, prelude::*};
 
-#[derive(Debug)]
+use crate::error::{MalformedHeader, MissingHeaderComponent};
+
+#[derive(Debug, Clone)]
 pub struct InventoryHeader {
     pub project_name: String,
     pub project_version: String,
@@ -22,10 +26,9 @@ fn parse_inventory_file_version(buffer: &mut &[u8]) -> WinnowResult<u8> {
     // but we can be a little more flexible
     trace(
         "inventory version",
-        delimited(
+        preceded(
             trace("prefix", take_till(1.., AsChar::is_dec_digit)),
-            trace("version", take_while(1.., AsChar::is_dec_digit)),
-            trace("trim", (space0, line_ending)),
+            trace("version", take_while(1.., |c| !AsChar::is_space(c))),
         ),
     )
     .parse_to()
@@ -38,11 +41,7 @@ fn parse_project_name(buffer: &mut &[u8]) -> WinnowResult<String> {
     // https://github.com/sphinx-doc/sphinx/blob/ac3f74a3e0fbb326f73989a16dfa369e072064ca/sphinx/util/inventory.py#L126
     trace(
         "project name",
-        delimited(
-            trace("prefix", take(11usize)),
-            trace("name", till_line_ending),
-            line_ending,
-        ),
+        preceded(trace("prefix", take(11usize)), trace("name", rest)),
     )
     .parse_to()
     .map(|s: String| s.trim().to_owned())
@@ -54,20 +53,17 @@ fn parse_project_name(buffer: &mut &[u8]) -> WinnowResult<String> {
 fn parse_project_version(buffer: &mut &[u8]) -> WinnowResult<String> {
     // this is how sphinx itself does it
     // https://github.com/sphinx-doc/sphinx/blob/ac3f74a3e0fbb326f73989a16dfa369e072064ca/sphinx/util/inventory.py#L126
-    trace(
-        "project version",
-        delimited(take(11usize), till_line_ending, line_ending),
-    )
-    .parse_to()
-    .map(|s: String| s.trim().to_owned())
-    .parse_next(buffer)
+    trace("project version", preceded(take(11usize), rest))
+        .parse_to()
+        .map(|s: String| s.trim().to_owned())
+        .parse_next(buffer)
 }
 
-fn parse_compression_method_line(buffer: &mut &[u8]) -> WinnowResult<String> {
+fn parse_compression_method(buffer: &mut &[u8]) -> WinnowResult<String> {
     // this is how sphinx itself does it even if it's a bit silly
     trace(
         "compression description",
-        terminated(till_line_ending, line_ending),
+        preceded(take_until(0.., "zlib"), "zlib"),
     )
     .parse_to()
     .verify(|c: &str| !c.is_empty())
@@ -90,11 +86,43 @@ fn parse_compression_method_line(buffer: &mut &[u8]) -> WinnowResult<String> {
 /// errors on things such as unknown or unsupported sphinx versions. The caller is
 /// responsible for checking those
 ///
-pub fn parse_header(buffer: &mut &[u8]) -> WinnowResult<InventoryHeader> {
-    let inventory_version = parse_inventory_file_version(buffer)?;
-    let project_name = parse_project_name(buffer)?;
-    let project_version = parse_project_version(buffer)?;
-    let compression_method_description = parse_compression_method_line(buffer)?;
+pub fn parse_header<R: BufRead>(reader: &mut R) -> Result<InventoryHeader, MalformedHeader> {
+    let mut lines_iter = reader.lines();
+
+    // Currently the API requires that we pass a buffer to the parsing function,
+    // and we need the original buffer to display the error so this is required to be split up
+    // This will hopefully be addressed in a future iteration of the API
+    let inventory_version_line = lines_iter.next().ok_or(MalformedHeader::IncompleteHeader(
+        MissingHeaderComponent::InvVersion,
+    ))??;
+
+    let inventory_version = parse_inventory_file_version(&mut inventory_version_line.as_bytes())
+        .map_err(|e| MalformedHeader::ParseError(fmt_context_error(&inventory_version_line, &e)))?;
+
+    let project_name_line = lines_iter.next().ok_or(MalformedHeader::IncompleteHeader(
+        MissingHeaderComponent::ProjectName,
+    ))??;
+
+    let project_name = parse_project_name(&mut project_name_line.as_bytes())
+        .map_err(|e| MalformedHeader::ParseError(fmt_context_error(&project_name_line, &e)))?;
+
+    let project_version_line = lines_iter.next().ok_or(MalformedHeader::IncompleteHeader(
+        MissingHeaderComponent::ProjectVersion,
+    ))??;
+
+    let project_version = parse_project_version(&mut project_version_line.as_bytes())
+        .map_err(|e| MalformedHeader::ParseError(fmt_context_error(&project_version_line, &e)))?;
+
+    let compression_method_description_line = lines_iter.next().ok_or(
+        MalformedHeader::IncompleteHeader(MissingHeaderComponent::CompressionDescription),
+    )??;
+
+    let compression_method_description = parse_compression_method(
+        &mut compression_method_description_line.as_bytes(),
+    )
+    .map_err(|e| {
+        MalformedHeader::ParseError(fmt_context_error(&compression_method_description_line, &e))
+    })?;
 
     let header = InventoryHeader {
         project_name,
@@ -106,29 +134,33 @@ pub fn parse_header(buffer: &mut &[u8]) -> WinnowResult<InventoryHeader> {
     Ok(header)
 }
 
+fn fmt_context_error(input: &str, err: &ContextError) -> String {
+    format!("failed to parse line: {input} because of the following error: {err:#?}")
+}
+
 #[cfg(test)]
 mod test {
-    use crate::header::parse_header;
-    use winnow::Result;
+    use std::io::{BufReader, Cursor};
+
+    use crate::{error::MalformedHeader, header::parse_header};
 
     #[test]
-    fn test_numpy_header() -> Result<()> {
-        let mut header = "# Sphinx inventory version 2
+    fn test_numpy_header() -> Result<(), MalformedHeader> {
+        let header = "# Sphinx inventory version 2
 # Project: NumPy
 # Version: 2.3
 # The remainder of this file is compressed using zlib.
 "
         .as_bytes();
 
-        let header = parse_header(&mut header)?;
+        let mut reader = BufReader::new(Cursor::new(header));
+
+        let header = parse_header(&mut reader)?;
 
         assert_eq!(header.inventory_version, 2);
         assert_eq!(header.project_name, "NumPy".to_string());
         assert_eq!(header.project_version, "2.3".to_string());
-        assert_eq!(
-            header.compression_method_description,
-            "# The remainder of this file is compressed using zlib.".to_string()
-        );
+        assert_eq!(header.compression_method_description, "zlib".to_string());
         Ok(())
     }
 

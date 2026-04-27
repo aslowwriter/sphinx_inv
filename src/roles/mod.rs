@@ -22,7 +22,7 @@ pub use py_role::PyRole;
 pub use rst_role::RstRole;
 pub use std_role::StdRole;
 
-use crate::error::RecordParseError;
+use crate::error::MalformedReference;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
@@ -37,7 +37,7 @@ pub enum SphinxType {
 }
 
 impl TryFrom<&str> for SphinxType {
-    type Error = RecordParseError;
+    type Error = MalformedReference;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value.split_once(':') {
@@ -49,9 +49,9 @@ impl TryFrom<&str> for SphinxType {
                 "js" => Ok(SphinxType::JavaScript(JsRole::from_str(role)?)),
                 "math" => Ok(SphinxType::Mathematics(MathRole::from_str(role)?)),
                 "rst" => Ok(SphinxType::ReStructuredText(RstRole::from_str(role)?)),
-                _ => Err(RecordParseError::InvalidDomain(domain.to_string())),
+                _ => Err(MalformedReference::InvalidDomain(domain.to_string())),
             },
-            None => Err(RecordParseError::MalformedDomainField(value.to_string())),
+            None => Err(MalformedReference::MalformedDomainField(value.to_string())),
         }
     }
 }

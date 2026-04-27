@@ -14,7 +14,7 @@ pub enum SphinxInvError {
     ParseError(String),
 
     #[error("Malformed Header")]
-    MalformedHeader,
+    MalformedHeader(#[from] MalformedHeader),
 
     #[error("Unsupported inventory version: {0}")]
     UnsupportedInventoryVersion(u8),
@@ -24,7 +24,40 @@ pub enum SphinxInvError {
 }
 
 #[derive(Error, Debug)]
-pub enum RecordParseError {
+pub enum MissingHeaderComponent {
+    #[error("inventory format version")]
+    InvVersion,
+
+    #[error("project name")]
+    ProjectName,
+
+    #[error("project version")]
+    ProjectVersion,
+
+    #[error("compression description")]
+    CompressionDescription,
+}
+
+#[derive(Error, Debug)]
+pub enum MalformedHeader {
+    #[error("Input was missing the following header component: {0}")]
+    IncompleteHeader(MissingHeaderComponent),
+
+    #[error("Could not parse header line: {0}")]
+    ParseError(String),
+
+    #[error("Unsupported inventory version: {0}")]
+    UnsupportedInventoryVersion(u8),
+
+    #[error("Unsupported compression method: {0}")]
+    UnsupportedCompressionMethod(String),
+
+    #[error("IO error")]
+    IoError(#[from] std::io::Error),
+}
+
+#[derive(Error, Debug)]
+pub enum MalformedReference {
     #[error("Invalid Domain: {0}")]
     InvalidDomain(String),
 

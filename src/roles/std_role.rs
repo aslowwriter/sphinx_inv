@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use winnow::{ModalResult, Parser, combinator::trace, stream::AsChar, token::take_till};
 
-use crate::roles::{RecordParseError, SphinxType};
+use crate::roles::{MalformedReference, SphinxType};
 
 #[derive(Debug, PartialEq)]
 pub enum StdRole {
@@ -28,7 +28,7 @@ pub enum StdRole {
 }
 
 impl FromStr for StdRole {
-    type Err = RecordParseError;
+    type Err = MalformedReference;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
@@ -42,13 +42,13 @@ impl FromStr for StdRole {
             "monitoring-event" => Ok(StdRole::MonitoringEvent),
             "envvar" => Ok(StdRole::Envvar),
 
-            _ => Err(RecordParseError::InvalidRole(s.to_string())),
+            _ => Err(MalformedReference::InvalidRole(s.to_string())),
         }
     }
 }
 
 impl TryFrom<&str> for StdRole {
-    type Error = RecordParseError;
+    type Error = MalformedReference;
     fn try_from(value: &str) -> std::result::Result<StdRole, Self::Error> {
         StdRole::from_str(value)
     }
@@ -77,7 +77,7 @@ mod test {
     use winnow::{ModalResult, Result};
 
     use crate::{
-        error::RecordParseError,
+        error::MalformedReference,
         roles::{SphinxType, StdRole, std_role::std_role},
     };
 
@@ -107,7 +107,7 @@ mod test {
     }
 
     #[test]
-    fn test_sphinx_role_parsing_std() -> Result<(), RecordParseError> {
+    fn test_sphinx_role_parsing_std() -> Result<(), MalformedReference> {
         assert_eq!(
             SphinxType::try_from("std:doc")?,
             SphinxType::Std(StdRole::Doc)
