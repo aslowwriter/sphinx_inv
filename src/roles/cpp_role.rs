@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use winnow::{ModalResult, Parser, error::StrContext, stream::AsChar, token::take_till};
 
-use crate::{error::RecordParseError, roles::SphinxType};
+use crate::{error::MalformedReference, roles::SphinxType};
 
 /// Describes a C++ role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `cpp:{role}`
@@ -36,7 +36,7 @@ pub enum CppRole {
 }
 
 impl FromStr for CppRole {
-    type Err = RecordParseError;
+    type Err = MalformedReference;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
@@ -46,13 +46,13 @@ impl FromStr for CppRole {
             "member" => Ok(CppRole::Member),
             "templateParam" => Ok(CppRole::TemplateParam),
 
-            _ => Err(RecordParseError::InvalidRole(s.to_string())),
+            _ => Err(MalformedReference::InvalidRole(s.to_string())),
         }
     }
 }
 
 impl TryFrom<&str> for CppRole {
-    type Error = RecordParseError;
+    type Error = MalformedReference;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         Self::from_str(value)
@@ -72,7 +72,7 @@ pub(crate) fn cpp_role(input: &mut &str) -> ModalResult<SphinxType> {
 #[cfg(test)]
 mod test {
 
-    use crate::error::RecordParseError;
+    use crate::error::MalformedReference;
 
     use super::*;
     #[test]
@@ -86,7 +86,7 @@ mod test {
         assert!(CppRole::try_from("function Param").is_err());
     }
     #[test]
-    fn test_sphinx_type_parsing_cpp() -> Result<(), RecordParseError> {
+    fn test_sphinx_type_parsing_cpp() -> Result<(), MalformedReference> {
         assert_eq!(CppRole::try_from("class")?, CppRole::Class);
         assert_eq!(CppRole::try_from("function")?, CppRole::Function);
         assert_eq!(CppRole::try_from("functionParam")?, CppRole::FunctionParam);

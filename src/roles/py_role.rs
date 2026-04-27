@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use winnow::{ModalResult, Parser, Result, error::StrContext, stream::AsChar, token::take_till};
 
-use crate::{error::RecordParseError, roles::SphinxType};
+use crate::{error::MalformedReference, roles::SphinxType};
 
 /// Describes a Python role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `py:{role}`
@@ -52,7 +52,7 @@ pub enum PyRole {
     Class,
 }
 impl FromStr for PyRole {
-    type Err = RecordParseError;
+    type Err = MalformedReference;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
@@ -65,13 +65,13 @@ impl FromStr for PyRole {
             "property" => Ok(PyRole::Property),
             "class" => Ok(PyRole::Class),
 
-            _ => Err(RecordParseError::InvalidRole(s.to_string())),
+            _ => Err(MalformedReference::InvalidRole(s.to_string())),
         }
     }
 }
 
 impl TryFrom<&str> for PyRole {
-    type Error = RecordParseError;
+    type Error = MalformedReference;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         Self::from_str(value)
@@ -93,7 +93,7 @@ mod test {
 
     use winnow::ModalResult;
 
-    use crate::error::RecordParseError;
+    use crate::error::MalformedReference;
     use crate::roles::PyRole;
     use crate::roles::SphinxType;
     use crate::roles::py_role::Result;
@@ -133,7 +133,7 @@ mod test {
         assert!(PyRole::try_from(" asdf").is_err());
     }
     #[test]
-    fn test_sphinx_type_parsing_py() -> Result<(), RecordParseError> {
+    fn test_sphinx_type_parsing_py() -> Result<(), MalformedReference> {
         assert_eq!(PyRole::try_from("attribute")?, PyRole::Attribute);
         assert_eq!(PyRole::try_from("data")?, PyRole::Data);
         assert_eq!(PyRole::try_from("exception")?, PyRole::Exception);

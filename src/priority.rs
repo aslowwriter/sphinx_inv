@@ -1,4 +1,4 @@
-use crate::error::RecordParseError;
+use crate::error::MalformedReference;
 
 #[derive(Debug, PartialEq)]
 pub enum SphinxPriority {
@@ -8,7 +8,7 @@ pub enum SphinxPriority {
     Low,
 }
 impl TryFrom<i32> for SphinxPriority {
-    type Error = RecordParseError;
+    type Error = MalformedReference;
 
     fn try_from(value: i32) -> Result<Self, Self::Error> {
         match value {
@@ -16,12 +16,12 @@ impl TryFrom<i32> for SphinxPriority {
             1 => Ok(SphinxPriority::Standard),
             0 => Ok(SphinxPriority::High),
             2 => Ok(SphinxPriority::Low),
-            _ => Err(RecordParseError::InvalidRowPriority(value.to_string())),
+            _ => Err(MalformedReference::InvalidRowPriority(value.to_string())),
         }
     }
 }
 impl TryFrom<&str> for SphinxPriority {
-    type Error = RecordParseError;
+    type Error = MalformedReference;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
@@ -29,7 +29,7 @@ impl TryFrom<&str> for SphinxPriority {
             "1" => Ok(SphinxPriority::Standard),
             "0" => Ok(SphinxPriority::High),
             "2" => Ok(SphinxPriority::Low),
-            _ => Err(RecordParseError::InvalidRowPriority(value.to_string())),
+            _ => Err(MalformedReference::InvalidRowPriority(value.to_string())),
         }
     }
 }

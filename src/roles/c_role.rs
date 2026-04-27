@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use winnow::{ModalResult, Parser, error::StrContext, stream::AsChar, token::take_till};
 
-use crate::{error::RecordParseError, roles::SphinxType};
+use crate::{error::MalformedReference, roles::SphinxType};
 
 /// Describes a C role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `c:{role}`
@@ -50,7 +50,7 @@ pub enum CRole {
 }
 
 impl FromStr for CRole {
-    type Err = RecordParseError;
+    type Err = MalformedReference;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
@@ -65,7 +65,7 @@ impl FromStr for CRole {
             "struct" => Ok(CRole::Struct),
             "union" => Ok(CRole::Union),
 
-            _ => Err(RecordParseError::InvalidRole(s.to_string())),
+            _ => Err(MalformedReference::InvalidRole(s.to_string())),
         }
     }
 }

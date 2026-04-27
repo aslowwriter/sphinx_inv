@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use winnow::{ModalResult, Parser, Result, error::StrContext, stream::AsChar, token::take_till};
 
-use crate::{error::RecordParseError, roles::SphinxType};
+use crate::{error::MalformedReference, roles::SphinxType};
 
 /// Describes a Mathematics role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `math:{role}`
@@ -15,18 +15,18 @@ pub enum MathRole {
     Numref,
 }
 impl FromStr for MathRole {
-    type Err = RecordParseError;
+    type Err = MalformedReference;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
             "numref" => Ok(MathRole::Numref),
 
-            _ => Err(RecordParseError::InvalidRole(s.to_string())),
+            _ => Err(MalformedReference::InvalidRole(s.to_string())),
         }
     }
 }
 impl TryFrom<&str> for MathRole {
-    type Error = RecordParseError;
+    type Error = MalformedReference;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         Self::from_str(value)
@@ -81,7 +81,7 @@ mod test {
         assert!(MathRole::try_from(" asdf").is_err());
     }
     #[test]
-    fn test_sphinx_type_parsing_math() -> Result<(), RecordParseError> {
+    fn test_sphinx_type_parsing_math() -> Result<(), MalformedReference> {
         assert_eq!(MathRole::try_from("numref")?, MathRole::Numref);
         Ok(())
     }
