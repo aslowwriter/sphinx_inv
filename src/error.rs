@@ -16,6 +16,9 @@ pub enum SphinxInvError {
     #[error("Malformed Header")]
     MalformedHeader(#[from] MalformedHeader),
 
+    #[error("Malformed Header")]
+    MalformedReference(#[from] MalformedReference),
+
     #[error("Unsupported inventory version: {0}")]
     UnsupportedInventoryVersion(u8),
 
@@ -56,7 +59,7 @@ pub enum MalformedHeader {
     IoError(#[from] std::io::Error),
 }
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, PartialEq)]
 pub enum MalformedReference {
     #[error("Invalid Domain: {0}")]
     InvalidDomain(String),
