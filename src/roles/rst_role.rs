@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use winnow::{ModalResult, Parser, error::StrContext, stream::AsChar, token::take_till};
 
@@ -16,6 +16,15 @@ pub enum RstRole {
     /// Describes an option for a reStructuredText directive
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/restructuredtext.html#directive-rst-directive-option)
     Option,
+}
+
+impl Display for RstRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            RstRole::Directive => "directive",
+            RstRole::Option => "directive:option",
+        })
+    }
 }
 
 /// Parses a cpp role as defined in [`RstRole`]

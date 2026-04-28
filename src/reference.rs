@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::{
     priority::SphinxPriority,
     roles::{SphinxType, c_role, cpp_role, js_role, math_role, py_role, rst_role, std_role},
@@ -18,6 +20,33 @@ pub struct SphinxReference {
     pub priority: SphinxPriority,
     pub location: String,
     pub display_name: String,
+}
+
+impl SphinxReference {
+    pub fn new(
+        name: String,
+        sphinx_type: SphinxType,
+        priority: Option<SphinxPriority>,
+        location: String,
+        display_name: Option<String>,
+    ) -> Self {
+        Self {
+            name,
+            sphinx_type,
+            priority: priority.unwrap_or(SphinxPriority::Standard),
+            location,
+            display_name: display_name.unwrap_or("-".to_string()),
+        }
+    }
+}
+
+impl Display for SphinxReference {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!(
+            "{} {} {} {} {}",
+            self.name, self.sphinx_type, self.priority, self.location, self.display_name
+        ))
+    }
 }
 
 fn word<'s>(input: &mut &'s str) -> ModalResult<&'s str> {
@@ -93,25 +122,28 @@ pub fn reference(input: &mut &str) -> ModalResult<SphinxReference> {
     let location = trace("location", uri).parse_next(input)?;
     let dispname = trace("display_name", display_name).parse_next(input)?;
 
-    let display_name = if dispname == "-" {
-        name.clone()
-    } else {
-        dispname.to_string()
-    };
-    let location = location.replace('$', &name);
+    // let display_name = if dispname == "-" {
+    //     name.clone()
+    // } else {
+    //     dispname.to_string()
+    // };
+    // let location = location.replace('$', &name);
     Ok(SphinxReference {
         name: name.clone(),
         sphinx_type,
         priority: prio,
-        location,
-        display_name,
+        location: location.to_string(),
+        display_name: dispname.to_string(),
     })
 }
 
 #[cfg(test)]
 mod test {
 
-    use crate::roles::{PyRole, RstRole, StdRole};
+    use crate::{
+        CRole,
+        roles::{PyRole, RstRole, StdRole},
+    };
 
     use super::*;
 
@@ -144,8 +176,8 @@ mod test {
             SphinxType::ReStructuredText(RstRole::Option)
         );
         assert_eq!(sphinx_ref.priority, SphinxPriority::Standard);
-        assert_eq!(sphinx_ref.location, "library/stdtypes.html#str.join");
-        assert_eq!(sphinx_ref.display_name, "str.join");
+        assert_eq!(sphinx_ref.location, "library/stdtypes.html#$");
+        assert_eq!(sphinx_ref.display_name, "-");
 
         assert_eq!(input, "");
         Ok(())
@@ -166,8 +198,8 @@ mod test {
         assert_eq!(sphinx_ref.name, "str.join".to_string());
         assert_eq!(sphinx_ref.sphinx_type, SphinxType::Python(PyRole::Method));
         assert_eq!(sphinx_ref.priority, SphinxPriority::Standard);
-        assert_eq!(sphinx_ref.location, "library/stdtypes.html#str.join");
-        assert_eq!(sphinx_ref.display_name, "str.join");
+        assert_eq!(sphinx_ref.location, "library/stdtypes.html#$");
+        assert_eq!(sphinx_ref.display_name, "-");
 
         assert_eq!(input, "");
         Ok(())
@@ -220,5 +252,25 @@ mod test {
         let result = reference(&mut input);
 
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn new_reference() {
+        assert_eq!(
+            SphinxReference {
+                name: "foo".to_string(),
+                sphinx_type: SphinxType::C(CRole::Macro),
+                priority: SphinxPriority::Standard,
+                location: "foo/bar".to_string(),
+                display_name: "-".to_string()
+            },
+            SphinxReference::new(
+                "foo".to_string(),
+                SphinxType::C(CRole::Macro),
+                None,
+                "foo/bar".to_string(),
+                None
+            )
+        );
     }
 }

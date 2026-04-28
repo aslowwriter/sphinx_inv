@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use winnow::{ModalResult, Parser, Result, error::StrContext, stream::AsChar, token::take_till};
 
@@ -50,6 +50,21 @@ pub enum PyRole {
     /// A python class
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-method)
     Class,
+}
+impl Display for PyRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            PyRole::Attribute => "attribute",
+            PyRole::Data => "data",
+            PyRole::Exception => "exception",
+            PyRole::Type => "type",
+            PyRole::Function => "function",
+            PyRole::Method => "method",
+            PyRole::Module => "module",
+            PyRole::Property => "property",
+            PyRole::Class => "class",
+        })
+    }
 }
 impl FromStr for PyRole {
     type Err = MalformedReference;

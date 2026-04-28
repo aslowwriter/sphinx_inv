@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::io::BufRead;
 
 use winnow::prelude::*;
@@ -13,10 +14,41 @@ use crate::error::{MalformedHeader, MissingHeaderComponent};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct InventoryHeader {
+    /// the display name of the project this inventory refers to (can contain internal whitespace)
     pub project_name: String,
+
+    /// the version of the project this inventory refers to (should be without a leading v)
     pub project_version: String,
+
+    /// a field for storing and checking the inventory version (should always be 2)
     pub inventory_version: u8,
+
+    /// a field for storing and checking the body compression method (should always be `zlib`)
     pub compression_method_description: String,
+}
+
+impl InventoryHeader {
+    pub fn new(name: &str, version: &str) -> Self {
+        InventoryHeader {
+            project_name: name.to_string(),
+            project_version: version.to_string(),
+            inventory_version: 2,
+            compression_method_description: "zlib".to_string(),
+        }
+    }
+}
+
+impl Display for InventoryHeader {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!(
+            "# Sphinx inventory version {}\n",
+            self.inventory_version
+        ))?;
+        f.write_str(&format!("# Project: {}\n", self.project_name))?;
+        f.write_str(&format!("# Version: {}\n", self.project_version))?;
+        f.write_str("# The remainder of this file is compressed using zlib.\n")?;
+        Ok(())
+    }
 }
 
 /// Parses the inventory file version from the ascii header part of an inventory file
@@ -144,7 +176,7 @@ fn fmt_context_error(input: &str, err: &ContextError) -> String {
 mod test {
     use std::io::{BufReader, Cursor};
 
-    use crate::{error::MalformedHeader, header::parse_header};
+    use crate::{InventoryHeader, error::MalformedHeader, header::parse_header};
 
     #[test]
     fn test_numpy_header() -> Result<(), MalformedHeader> {
@@ -206,5 +238,18 @@ mod test {
 
         let result = parse_header(&mut header);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn new_header() {
+        assert_eq!(
+            InventoryHeader {
+                project_name: "foo".to_string(),
+                project_version: "0.24.24".to_string(),
+                inventory_version: 2,
+                compression_method_description: "zlib".to_string()
+            },
+            InventoryHeader::new("foo", "0.24.24")
+        );
     }
 }

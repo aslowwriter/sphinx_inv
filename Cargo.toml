@@ -18,9 +18,9 @@ path = "src/lib.rs"
 
 
 [dependencies]
-flate2            = "1.1.9"
-thiserror         = "2.0.18"
-winnow            = { version = "1.0.0", features = ["simd"] }
+flate2    = "1.1.9"
+thiserror = "2.0.18"
+winnow    = { version = "1.0.0", features = ["simd"] }
 
 [profile.release]
 debug         = true
@@ -54,3 +54,9 @@ match_bool                 = "warn"
 needless_bool              = "deny"
 unwrap_used                = "warn"
 expect_used                = "warn"
+must_use_candidate         = "allow"
+missing_errors_doc         = "allow"
+missing_panics_doc         = "allow"
+
+[dev-dependencies]
+pretty_assertions = "1.4.1"
