@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::error::MalformedReference;
 
 #[derive(Debug, PartialEq)]
@@ -6,6 +8,17 @@ pub enum SphinxPriority {
     Standard,
     High,
     Low,
+}
+
+impl Display for SphinxPriority {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            SphinxPriority::Omit => "-1",
+            SphinxPriority::Standard => "1",
+            SphinxPriority::High => "0",
+            SphinxPriority::Low => "2",
+        })
+    }
 }
 impl TryFrom<i32> for SphinxPriority {
     type Error = MalformedReference;

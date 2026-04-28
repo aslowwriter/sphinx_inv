@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use winnow::{ModalResult, Parser, combinator::trace, stream::AsChar, token::take_till};
 
@@ -25,6 +25,22 @@ pub enum StdRole {
     /// Describes an environment variable that the documented code
     /// or program uses or defines
     Envvar,
+}
+
+impl Display for StdRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            StdRole::Doc => "doc",
+            StdRole::Label => "label",
+            StdRole::Term => "term",
+            StdRole::Cmdoption => "cmdoption",
+            StdRole::Pdbcommand => "pdbcommand",
+            StdRole::Token => "token",
+            StdRole::Opcode => "opcode",
+            StdRole::MonitoringEvent => "monitoring-event",
+            StdRole::Envvar => "envvar",
+        })
+    }
 }
 
 impl FromStr for StdRole {

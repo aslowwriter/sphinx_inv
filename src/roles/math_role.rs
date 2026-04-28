@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use winnow::{ModalResult, Parser, Result, error::StrContext, stream::AsChar, token::take_till};
 
@@ -13,6 +13,13 @@ pub enum MathRole {
     /// can also refer to figures
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/mathematics.html)
     Numref,
+}
+impl Display for MathRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            MathRole::Numref => "numref",
+        })
+    }
 }
 impl FromStr for MathRole {
     type Err = MalformedReference;
@@ -85,4 +92,7 @@ mod test {
         assert_eq!(MathRole::try_from("numref")?, MathRole::Numref);
         Ok(())
     }
+
+    #[test]
+    fn render() {}
 }

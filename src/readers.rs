@@ -12,7 +12,10 @@ use crate::{
 };
 pub struct SphinxInventoryReader<R: std::io::Read> {
     header: InventoryHeader,
-    inner: Lines<BufReader<ZlibDecoder<R>>>,
+    // yes we double buffer here, which is necessary to make sure
+    // we don't loose any input from the first buffer when we make the zlib decoder
+    // if we just call .into_inner we'll loose part (don't ask how I know that).
+    inner: Lines<BufReader<ZlibDecoder<BufReader<R>>>>,
     current_line: usize, // just for reporting
 }
 
@@ -31,14 +34,17 @@ impl<R: std::io::Read> SphinxInventoryReader<R> {
     pub fn from_reader(reader: R) -> Result<SphinxInventoryReader<R>, SphinxInvError> {
         let mut buffered_header_reader = BufReader::new(reader);
         let header = read_header(&mut buffered_header_reader)?;
-        let new_reader =
-            BufReader::new(ZlibDecoder::new(buffered_header_reader.into_inner())).lines();
+        let new_reader = BufReader::new(ZlibDecoder::new(buffered_header_reader)).lines();
 
         Ok(SphinxInventoryReader {
             header,
             inner: new_reader,
             current_line: 0,
         })
+    }
+
+    pub fn current_line(&self) -> usize {
+        self.current_line
     }
 
     pub fn header(&self) -> &InventoryHeader {
@@ -67,7 +73,8 @@ impl<R: std::io::Read> Iterator for SphinxInventoryReader<R> {
 
     fn next(&mut self) -> Option<Self::Item> {
         self.current_line += 1;
-        parse_line(self.inner.next(), self.current_line)
+        let next = self.inner.next();
+        parse_line(next, self.current_line)
     }
 }
 
@@ -170,11 +177,11 @@ mod test {
     #![allow(clippy::unwrap_used)]
     use std::io::Cursor;
 
+    use pretty_assertions::assert_eq;
+
     use crate::{
-        InventoryHeader, SphinxReference,
-        error::{MalformedReference, SphinxInvError},
-        readers::PlainTextSphinxInventoryReader,
-        roles::PyRole,
+        InventoryHeader, SphinxReference, error::SphinxInvError,
+        readers::PlainTextSphinxInventoryReader, roles::PyRole,
     };
 
     #[test]
@@ -210,8 +217,8 @@ str.lower py:method 1 library/stdtypes.html#$ -
                 name: "str.lower".to_string(),
                 sphinx_type: crate::roles::SphinxType::Python(PyRole::Method),
                 priority: crate::priority::SphinxPriority::Standard,
-                location: "library/stdtypes.html#str.lower".to_string(),
-                display_name: "str.lower".to_string()
+                location: "library/stdtypes.html#$".to_string(),
+                display_name: "-".to_string()
             }
         );
 
@@ -248,8 +255,8 @@ str.lower py:method 1 library/stdtypes.html#$ -
                 name: "str.join".to_string(),
                 sphinx_type: crate::roles::SphinxType::Python(PyRole::Method),
                 priority: crate::priority::SphinxPriority::Standard,
-                location: "library/stdtypes.html#str.join".to_string(),
-                display_name: "str.join".to_string()
+                location: "library/stdtypes.html#$".to_string(),
+                display_name: "-".to_string()
             }
         );
 
@@ -259,8 +266,8 @@ str.lower py:method 1 library/stdtypes.html#$ -
                 name: "str.lower".to_string(),
                 sphinx_type: crate::roles::SphinxType::Python(PyRole::Method),
                 priority: crate::priority::SphinxPriority::Standard,
-                location: "library/stdtypes.html#str.lower".to_string(),
-                display_name: "str.lower".to_string()
+                location: "library/stdtypes.html#$".to_string(),
+                display_name: "-".to_string()
             }
         );
 

@@ -54,8 +54,8 @@ jobs:
         with:
           reporter: 'github-pr-check'
           github_token: ${{ secrets.GITHUB_TOKEN }}
-  # this is commented out because there is nothing to check yet since we don't have a previous verions yet
-  # I don't want my tempaltes to have red CI when they've just been created
+  # this is commented out because there is nothing to check yet since we don't have a previous versions yet
+  # I don't want my templates to have red CI when they've just been created
   # semver:
   #   runs-on: ubuntu-latest
   #   name: semver

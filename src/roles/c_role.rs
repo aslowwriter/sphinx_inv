@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use winnow::{ModalResult, Parser, error::StrContext, stream::AsChar, token::take_till};
 
@@ -47,6 +47,22 @@ pub enum CRole {
     /// Describes a C union
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/c.html#directive-c-union)
     Union,
+}
+impl Display for CRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            CRole::Enumerator => "enumerator",
+            CRole::Enum => "enum",
+            CRole::Function => "function",
+            CRole::FunctionParam => "functionParam",
+            CRole::Member => "member",
+            CRole::Macro => "macro",
+            CRole::Var => "var",
+            CRole::Type => "type",
+            CRole::Struct => "struct",
+            CRole::Union => "union",
+        })
+    }
 }
 
 impl FromStr for CRole {

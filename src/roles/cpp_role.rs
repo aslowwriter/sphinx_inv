@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use winnow::{ModalResult, Parser, error::StrContext, stream::AsChar, token::take_till};
 
@@ -35,6 +35,19 @@ pub enum CppRole {
     Type,
 }
 
+impl Display for CppRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            CppRole::Class => "class",
+            CppRole::Function => "function",
+            CppRole::FunctionParam => "functionParam",
+            CppRole::Member => "member",
+            CppRole::TemplateParam => "templateParam",
+            CppRole::Type => "type",
+        })
+    }
+}
+
 impl FromStr for CppRole {
     type Err = MalformedReference;
 
@@ -45,6 +58,7 @@ impl FromStr for CppRole {
             "functionParam" => Ok(CppRole::FunctionParam),
             "member" => Ok(CppRole::Member),
             "templateParam" => Ok(CppRole::TemplateParam),
+            "type" => Ok(CppRole::Type),
 
             _ => Err(MalformedReference::InvalidRole(s.to_string())),
         }

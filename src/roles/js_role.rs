@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use winnow::{ModalResult, Parser, error::StrContext, stream::AsChar, token::take_till};
 
@@ -27,6 +27,17 @@ pub enum JsRole {
     /// Describes a global variable or constant.
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/javascript.html#directive-js-data)
     Data,
+}
+impl Display for JsRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            JsRole::Module => "module",
+            JsRole::Function => "function",
+            JsRole::Method => "method",
+            JsRole::Class => "class",
+            JsRole::Data => "data",
+        })
+    }
 }
 impl FromStr for JsRole {
     type Err = MalformedReference;

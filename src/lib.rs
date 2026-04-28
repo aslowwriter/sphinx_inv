@@ -18,50 +18,80 @@
 //!
 //! ## Usage
 //!
-//! The main point of entry for this crate is the [`readers::SphinxInventoryReader`] which you can use to
-//! read and parse inventory data from any source that implements [`std::io::Read`]. These will
-//! produce [`InventoryHeader`] structs and an iterator over [`SphinxReference`]
+//! The main entry points of this create are the the [`InventoryHeader`] and [`SphinxReference`] data
+//! structs and the [`SphinxInventoryReader`] and [`SphinxInventoryWriter`]
+//! structs to handle with them.
+//!
+//! The [`SphinxInventoryReader`] and [`SphinxInventoryWriter`] can work with any struct that
+//! immplements [`std::io::Read`] and [`std::io::Write`] respectively. These are internally buffered
+//! so you do not have to wrap them yourself.
+//!
+//! When interacting with real `objects.inv` files in the wild you will most likely use the base
+//! reader and writer struct, but both also have a `PlainText` variant. The only difference is that
+//! the plain text versions don't encode/decode the data in zlib like the files do. This is mostly
+//! useful for debugging/testing. In the following examples we will use the plain text versions and
+//! the [`std::io::Cursor`] to make it easier to display the results, but the code should work
+//! basically unchanged by switching to a [`std::fs::File`] and the base readers and writers.
 //!
 //! ## Examples
 //!
-//! ### Reading
 //!
-//! You can construct a reader by using the [`readers::SphinxInventoryReader::from_reader`] like so:
-//! (Currently we use a non-existent file because the writing functionality has not been developed
-//! yet this will be rectified asap, but for now the following doctests are skipped)
-//!
-//! ```ignore
-//! # use sphinx_inv::SphinxInventoryReader;
+//! ```
+//! # use sphinx_inv::*;
 //! # use std::fs::File;
-//! # use std::path::Pathbuf;
+//! # use std::io::{Read, Write, Cursor};
+//! # use pretty_assertions::assert_eq;
 //! #
-//! let path = PathBuf::from("objects.inv");
-//! let mut file = File::open(path)?;
-//! let reader = SphinxInventoryReader::from_reader(file).unwrap();
+//! let header = InventoryHeader::new("Sphinx Inv", "0.2.0");
+//! let join_reference = SphinxReference::new(
+//!     "str.join".to_string(),
+//!     SphinxType::Python(PyRole::Method),
+//!     None,
+//!     "library/stdtypes.html#$".to_string(),
+//!     None);
+//! let lower_reference = SphinxReference::new(
+//!     "str.lower".to_string(),
+//!     SphinxType::Python(PyRole::Method),
+//!     None,
+//!     "library/stdtypes.html#$".to_string(),
+//!     None);
 //!
-//! println!("{:?}", reader.header());
+//! let mut buffer = Vec::new();
 //!
-//! for reference in reader {
-//!     println!("{}", reference.unwrap());
-//! }
+//! let mut cursor = Cursor::new(buffer);
+//! // the capacity is just to preallocate the internal buffer, it can be anything
+//! let mut writer = PlainTextSphinxInventoryWriter::from_header(&header, 2);
+//!
+//!
+//! // add the references to the writer
+//! writer.add_reference(&join_reference);
+//! writer.add_reference(&lower_reference);
+//!
+//! // add_reference on it's own only adds it to the internal buffer
+//! // nothing actually happens until you call [`SphinxInventoryWriter::finalize`]
+//! writer.finalize(&mut cursor).unwrap();
+//!
+//! let written = String::from_utf8(cursor.into_inner()).unwrap();
+//!
+//! assert_eq!(&written, "# Sphinx inventory version 2
+//! ## Project: Sphinx Inv
+//! ## Version: 0.2.0
+//! ## The remainder of this file is compressed using zlib.
+//! str.join py:method 1 library/stdtypes.html#$ -
+//! str.lower py:method 1 library/stdtypes.html#$ -
+//! ");
+//!
+//! let mut cursor = Cursor::new( written);
+//!
+//! let mut reader = PlainTextSphinxInventoryReader::from_reader(cursor).unwrap();
+//!
+//! assert_eq!(&header, reader.header());
+//!
+//! assert_eq!(reader.next().unwrap().unwrap(), join_reference);
+//! assert_eq!(reader.next().unwrap().unwrap(), lower_reference);
+//!
 //! ```
 //!
-//! If you have a local file you can also use the convenience wrapper
-//!
-//! if you have the data already in memory you can parse that instead: [`readers::SphinxInventoryReader::from_path`]
-//! ```ignore
-//! # use sphinx_inv::SphinxInventoryReader;
-//! # use std::path::PathBuf;
-//! #
-//! let path = PathBuf::from("objects.inv");
-//! let reader = SphinxInventoryReader::from_path(&path).unwrap();
-//!
-//! println!("{:?}", reader.header());
-//!
-//! for reference in reader {
-//!     println!("{:?}", reference.unwrap());
-//! }
-//! ```
 //!
 //! Note that this will consume the buffer, and afterwards it should be left empty.
 //!
@@ -127,6 +157,7 @@
 
 pub mod error;
 pub mod readers;
+pub mod writers;
 
 mod header;
 mod priority;
@@ -134,5 +165,7 @@ mod reference;
 mod roles;
 
 pub use header::InventoryHeader;
-pub use readers::SphinxInventoryReader;
+pub use readers::{PlainTextSphinxInventoryReader, SphinxInventoryReader};
 pub use reference::SphinxReference;
+pub use roles::*;
+pub use writers::{PlainTextSphinxInventoryWriter, SphinxInventoryWriter};
