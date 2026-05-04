@@ -1,6 +1,6 @@
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
-use crate::error::MalformedReference;
+use winnow::error::ContextError;
 
 #[derive(Debug, PartialEq)]
 pub enum SphinxPriority {
@@ -20,29 +20,16 @@ impl Display for SphinxPriority {
         })
     }
 }
-impl TryFrom<i32> for SphinxPriority {
-    type Error = MalformedReference;
+impl FromStr for SphinxPriority {
+    type Err = ContextError;
 
-    fn try_from(value: i32) -> Result<Self, Self::Error> {
-        match value {
-            -1 => Ok(SphinxPriority::Omit),
-            1 => Ok(SphinxPriority::Standard),
-            0 => Ok(SphinxPriority::High),
-            2 => Ok(SphinxPriority::Low),
-            _ => Err(MalformedReference::InvalidRowPriority(value.to_string())),
-        }
-    }
-}
-impl TryFrom<&str> for SphinxPriority {
-    type Error = MalformedReference;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value {
             "-1" => Ok(SphinxPriority::Omit),
             "1" => Ok(SphinxPriority::Standard),
             "0" => Ok(SphinxPriority::High),
             "2" => Ok(SphinxPriority::Low),
-            _ => Err(MalformedReference::InvalidRowPriority(value.to_string())),
+            _ => Err(ContextError::new()),
         }
     }
 }

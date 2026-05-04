@@ -1,8 +1,13 @@
 use std::{fmt::Display, str::FromStr};
 
-use winnow::{ModalResult, Parser, Result, error::StrContext, stream::AsChar, token::take_till};
+use winnow::{
+    ModalResult, Parser,
+    error::{ContextError, StrContext, StrContextValue},
+    stream::AsChar,
+    token::take_till,
+};
 
-use crate::{error::MalformedReference, roles::SphinxType};
+use crate::roles::SphinxType;
 
 /// Describes a Python role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `py:{role}`
@@ -67,7 +72,7 @@ impl Display for PyRole {
     }
 }
 impl FromStr for PyRole {
-    type Err = MalformedReference;
+    type Err = ContextError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
@@ -80,38 +85,52 @@ impl FromStr for PyRole {
             "property" => Ok(PyRole::Property),
             "class" => Ok(PyRole::Class),
 
-            _ => Err(MalformedReference::InvalidRole(s.to_string())),
+            _ => Err(ContextError::new()),
         }
-    }
-}
-
-impl TryFrom<&str> for PyRole {
-    type Error = MalformedReference;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        Self::from_str(value)
     }
 }
 
 /// Parses a py role as defined in [`PyRole`]
 /// may not contain whitespace but may contain other colons
 pub(crate) fn py_role(input: &mut &str) -> ModalResult<SphinxType> {
-    let role = take_till(0.., |c| AsChar::is_space(c) || AsChar::is_newline(c))
-        .context(StrContext::Label("Py Role"))
+    take_till(0.., AsChar::is_space)
         .parse_to()
-        .parse_next(input)?;
-    Ok(SphinxType::Python(role))
+        .context(StrContext::Label("python role"))
+        .context(StrContext::Expected(StrContextValue::StringLiteral(
+            "attribute",
+        )))
+        .context(StrContext::Expected(StrContextValue::StringLiteral("data")))
+        .context(StrContext::Expected(StrContextValue::StringLiteral(
+            "exception",
+        )))
+        .context(StrContext::Expected(StrContextValue::StringLiteral(
+            "function",
+        )))
+        .context(StrContext::Expected(StrContextValue::StringLiteral(
+            "method",
+        )))
+        .context(StrContext::Expected(StrContextValue::StringLiteral(
+            "module",
+        )))
+        .context(StrContext::Expected(StrContextValue::StringLiteral(
+            "property",
+        )))
+        .context(StrContext::Expected(StrContextValue::StringLiteral(
+            "class",
+        )))
+        .map(SphinxType::Python)
+        .parse_next(input)
 }
 
 #[cfg(test)]
 mod test {
 
+    use std::str::FromStr;
     use winnow::ModalResult;
+    use winnow::error::ContextError;
 
-    use crate::error::MalformedReference;
     use crate::roles::PyRole;
     use crate::roles::SphinxType;
-    use crate::roles::py_role::Result;
     use crate::roles::py_role::py_role;
 
     #[test]
@@ -140,23 +159,23 @@ mod test {
     }
     #[test]
     fn test_sphinx_role_parsing_std_err() {
-        assert!(PyRole::try_from("asdf").is_err());
-        assert!(PyRole::try_from("doc").is_err());
-        assert!(PyRole::try_from("").is_err());
-        assert!(PyRole::try_from("::::").is_err());
-        assert!(PyRole::try_from(" label").is_err());
-        assert!(PyRole::try_from(" asdf").is_err());
+        assert!(PyRole::from_str("asdf").is_err());
+        assert!(PyRole::from_str("doc").is_err());
+        assert!(PyRole::from_str("").is_err());
+        assert!(PyRole::from_str("::::").is_err());
+        assert!(PyRole::from_str(" label").is_err());
+        assert!(PyRole::from_str(" asdf").is_err());
     }
     #[test]
-    fn test_sphinx_type_parsing_py() -> Result<(), MalformedReference> {
-        assert_eq!(PyRole::try_from("attribute")?, PyRole::Attribute);
-        assert_eq!(PyRole::try_from("data")?, PyRole::Data);
-        assert_eq!(PyRole::try_from("exception")?, PyRole::Exception);
-        assert_eq!(PyRole::try_from("function")?, PyRole::Function);
-        assert_eq!(PyRole::try_from("method")?, PyRole::Method);
-        assert_eq!(PyRole::try_from("module")?, PyRole::Module);
-        assert_eq!(PyRole::try_from("property")?, PyRole::Property);
-        assert_eq!(PyRole::try_from("class")?, PyRole::Class);
+    fn test_sphinx_type_parsing_py() -> Result<(), ContextError> {
+        assert_eq!(PyRole::from_str("attribute")?, PyRole::Attribute);
+        assert_eq!(PyRole::from_str("data")?, PyRole::Data);
+        assert_eq!(PyRole::from_str("exception")?, PyRole::Exception);
+        assert_eq!(PyRole::from_str("function")?, PyRole::Function);
+        assert_eq!(PyRole::from_str("method")?, PyRole::Method);
+        assert_eq!(PyRole::from_str("module")?, PyRole::Module);
+        assert_eq!(PyRole::from_str("property")?, PyRole::Property);
+        assert_eq!(PyRole::from_str("class")?, PyRole::Class);
         Ok(())
     }
 }

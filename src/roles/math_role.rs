@@ -1,8 +1,13 @@
 use std::{fmt::Display, str::FromStr};
 
-use winnow::{ModalResult, Parser, Result, error::StrContext, stream::AsChar, token::take_till};
+use winnow::{
+    ModalResult, Parser,
+    error::{ContextError, StrContext},
+    stream::AsChar,
+    token::take_till,
+};
 
-use crate::{error::MalformedReference, roles::SphinxType};
+use crate::roles::SphinxType;
 
 /// Describes a Mathematics role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `math:{role}`
@@ -22,28 +27,23 @@ impl Display for MathRole {
     }
 }
 impl FromStr for MathRole {
-    type Err = MalformedReference;
+    type Err = ContextError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
             "numref" => Ok(MathRole::Numref),
-
-            _ => Err(MalformedReference::InvalidRole(s.to_string())),
+            // this is only really necessary to communicate with the parser
+            // so we don't have to communicate more than "it failed"
+            // as this should never happen
+            _ => Err(ContextError::new()),
         }
-    }
-}
-impl TryFrom<&str> for MathRole {
-    type Error = MalformedReference;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        Self::from_str(value)
     }
 }
 
 /// Parses a math role as defined in [`MathRole`]
 /// may not contain whitespace but may contain other colons
 pub(crate) fn math_role(input: &mut &str) -> ModalResult<SphinxType> {
-    let role = take_till(1.., |c| AsChar::is_space(c) || AsChar::is_newline(c))
+    let role = take_till(1.., AsChar::is_space)
         .context(StrContext::Label("Math Role"))
         .parse_to()
         .parse_next(input)?;
@@ -80,16 +80,16 @@ mod test {
     }
     #[test]
     fn test_sphinx_role_parsing_std_err() {
-        assert!(MathRole::try_from("asdf").is_err());
-        assert!(MathRole::try_from("doc").is_err());
-        assert!(MathRole::try_from("").is_err());
-        assert!(MathRole::try_from("::::").is_err());
-        assert!(MathRole::try_from(" label").is_err());
-        assert!(MathRole::try_from(" asdf").is_err());
+        assert!(MathRole::from_str("asdf").is_err());
+        assert!(MathRole::from_str("doc").is_err());
+        assert!(MathRole::from_str("").is_err());
+        assert!(MathRole::from_str("::::").is_err());
+        assert!(MathRole::from_str(" label").is_err());
+        assert!(MathRole::from_str(" asdf").is_err());
     }
     #[test]
-    fn test_sphinx_type_parsing_math() -> Result<(), MalformedReference> {
-        assert_eq!(MathRole::try_from("numref")?, MathRole::Numref);
+    fn test_sphinx_type_parsing_math() -> Result<(), ContextError> {
+        assert_eq!(MathRole::from_str("numref")?, MathRole::Numref);
         Ok(())
     }
 

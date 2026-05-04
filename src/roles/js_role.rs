@@ -1,8 +1,13 @@
 use std::{fmt::Display, str::FromStr};
 
-use winnow::{ModalResult, Parser, error::StrContext, stream::AsChar, token::take_till};
+use winnow::{
+    ModalResult, Parser,
+    error::{ContextError, StrContext},
+    stream::AsChar,
+    token::take_till,
+};
 
-use crate::{error::MalformedReference, roles::SphinxType};
+use crate::roles::SphinxType;
 
 /// Describes a JavaScript role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `js:{role}`
@@ -40,7 +45,7 @@ impl Display for JsRole {
     }
 }
 impl FromStr for JsRole {
-    type Err = MalformedReference;
+    type Err = ContextError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
@@ -50,23 +55,15 @@ impl FromStr for JsRole {
             "method" => Ok(JsRole::Method),
             "class" => Ok(JsRole::Class),
 
-            _ => Err(MalformedReference::InvalidRole(s.to_string())),
+            _ => Err(ContextError::new()),
         }
-    }
-}
-
-impl TryFrom<&str> for JsRole {
-    type Error = MalformedReference;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        Self::from_str(value)
     }
 }
 
 /// Parses a cpp role as defined in [`JsRole`]
 /// may not contain whitespace but may contain other colons
 pub(crate) fn js_role(input: &mut &str) -> ModalResult<SphinxType> {
-    let role = take_till(1.., |c| AsChar::is_space(c) || AsChar::is_newline(c))
+    let role = take_till(1.., AsChar::is_space)
         .context(StrContext::Label("Js Role"))
         .parse_to()
         .parse_next(input)?;
@@ -76,25 +73,23 @@ pub(crate) fn js_role(input: &mut &str) -> ModalResult<SphinxType> {
 #[cfg(test)]
 mod test {
 
-    use crate::error::MalformedReference;
-
     use super::*;
     #[test]
     fn test_sphinx_role_parsing_std_err() {
-        assert!(JsRole::try_from("asdf").is_err());
-        assert!(JsRole::try_from("doc").is_err());
-        assert!(JsRole::try_from("").is_err());
-        assert!(JsRole::try_from("::::").is_err());
-        assert!(JsRole::try_from(" label").is_err());
-        assert!(JsRole::try_from(" asdf").is_err());
+        assert!(JsRole::from_str("asdf").is_err());
+        assert!(JsRole::from_str("doc").is_err());
+        assert!(JsRole::from_str("").is_err());
+        assert!(JsRole::from_str("::::").is_err());
+        assert!(JsRole::from_str(" label").is_err());
+        assert!(JsRole::from_str(" asdf").is_err());
     }
     #[test]
-    fn test_sphinx_type_parsing_js() -> Result<(), MalformedReference> {
-        assert_eq!(JsRole::try_from("module")?, JsRole::Module);
-        assert_eq!(JsRole::try_from("function")?, JsRole::Function);
-        assert_eq!(JsRole::try_from("method")?, JsRole::Method);
-        assert_eq!(JsRole::try_from("class")?, JsRole::Class);
-        assert_eq!(JsRole::try_from("data")?, JsRole::Data);
+    fn test_sphinx_type_parsing_js() -> Result<(), ContextError> {
+        assert_eq!(JsRole::from_str("module")?, JsRole::Module);
+        assert_eq!(JsRole::from_str("function")?, JsRole::Function);
+        assert_eq!(JsRole::from_str("method")?, JsRole::Method);
+        assert_eq!(JsRole::from_str("class")?, JsRole::Class);
+        assert_eq!(JsRole::from_str("data")?, JsRole::Data);
         Ok(())
     }
 }

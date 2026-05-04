@@ -1,8 +1,13 @@
 use std::{fmt::Display, str::FromStr};
 
-use winnow::{ModalResult, Parser, error::StrContext, stream::AsChar, token::take_till};
+use winnow::{
+    ModalResult, Parser,
+    error::{ContextError, StrContext},
+    stream::AsChar,
+    token::take_till,
+};
 
-use crate::{error::MalformedReference, roles::SphinxType};
+use crate::roles::SphinxType;
 
 /// Describes a C role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `c:{role}`
@@ -66,7 +71,7 @@ impl Display for CRole {
 }
 
 impl FromStr for CRole {
-    type Err = MalformedReference;
+    type Err = ContextError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
@@ -81,7 +86,10 @@ impl FromStr for CRole {
             "struct" => Ok(CRole::Struct),
             "union" => Ok(CRole::Union),
 
-            _ => Err(MalformedReference::InvalidRole(s.to_string())),
+            // this is only really necessary to communicate with the parser
+            // so we don't have to communicate more than "it failed"
+            // as this should never happen
+            _ => Err(ContextError::new()),
         }
     }
 }
@@ -89,7 +97,7 @@ impl FromStr for CRole {
 /// Parses a c role as defined in [`CRole`]
 /// may not contain whitespace but may contain other colons
 pub(crate) fn c_role(input: &mut &str) -> ModalResult<SphinxType> {
-    let role = take_till(1.., |c| AsChar::is_space(c) || AsChar::is_newline(c))
+    let role = take_till(1.., AsChar::is_space)
         .context(StrContext::Label("c role"))
         .parse_to()
         .parse_next(input)?;

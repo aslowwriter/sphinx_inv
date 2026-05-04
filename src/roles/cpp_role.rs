@@ -1,8 +1,13 @@
 use std::{fmt::Display, str::FromStr};
 
-use winnow::{ModalResult, Parser, error::StrContext, stream::AsChar, token::take_till};
+use winnow::{
+    ModalResult, Parser,
+    error::{ContextError, StrContext},
+    stream::AsChar,
+    token::take_till,
+};
 
-use crate::{error::MalformedReference, roles::SphinxType};
+use crate::roles::SphinxType;
 
 /// Describes a C++ role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `cpp:{role}`
@@ -49,7 +54,7 @@ impl Display for CppRole {
 }
 
 impl FromStr for CppRole {
-    type Err = MalformedReference;
+    type Err = ContextError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
@@ -60,23 +65,18 @@ impl FromStr for CppRole {
             "templateParam" => Ok(CppRole::TemplateParam),
             "type" => Ok(CppRole::Type),
 
-            _ => Err(MalformedReference::InvalidRole(s.to_string())),
+            // this is only really necessary to communicate with the parser
+            // so we don't have to communicate more than "it failed"
+            // as this should never happen
+            _ => Err(ContextError::new()),
         }
-    }
-}
-
-impl TryFrom<&str> for CppRole {
-    type Error = MalformedReference;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        Self::from_str(value)
     }
 }
 
 /// Parses a cpp role as defined in [`CppRole`]
 /// may not contain whitespace but may contain other colons
 pub(crate) fn cpp_role(input: &mut &str) -> ModalResult<SphinxType> {
-    let role = take_till(1.., |c| AsChar::is_space(c) || AsChar::is_newline(c))
+    let role = take_till(1.., AsChar::is_space)
         .context(StrContext::Label("Cpp Role"))
         .parse_to()
         .parse_next(input)?;
@@ -86,26 +86,24 @@ pub(crate) fn cpp_role(input: &mut &str) -> ModalResult<SphinxType> {
 #[cfg(test)]
 mod test {
 
-    use crate::error::MalformedReference;
-
     use super::*;
     #[test]
     fn test_sphinx_role_parsing_std_err() {
-        assert!(CppRole::try_from("asdf").is_err());
-        assert!(CppRole::try_from("doc").is_err());
-        assert!(CppRole::try_from("").is_err());
-        assert!(CppRole::try_from("::::").is_err());
-        assert!(CppRole::try_from(" label").is_err());
-        assert!(CppRole::try_from(" asdf").is_err());
-        assert!(CppRole::try_from("function Param").is_err());
+        assert!(CppRole::from_str("asdf").is_err());
+        assert!(CppRole::from_str("doc").is_err());
+        assert!(CppRole::from_str("").is_err());
+        assert!(CppRole::from_str("::::").is_err());
+        assert!(CppRole::from_str(" label").is_err());
+        assert!(CppRole::from_str(" asdf").is_err());
+        assert!(CppRole::from_str("function Param").is_err());
     }
     #[test]
-    fn test_sphinx_type_parsing_cpp() -> Result<(), MalformedReference> {
-        assert_eq!(CppRole::try_from("class")?, CppRole::Class);
-        assert_eq!(CppRole::try_from("function")?, CppRole::Function);
-        assert_eq!(CppRole::try_from("functionParam")?, CppRole::FunctionParam);
-        assert_eq!(CppRole::try_from("templateParam")?, CppRole::TemplateParam);
-        assert_eq!(CppRole::try_from("member")?, CppRole::Member);
+    fn test_sphinx_type_parsing_cpp() -> Result<(), ContextError> {
+        assert_eq!(CppRole::from_str("class")?, CppRole::Class);
+        assert_eq!(CppRole::from_str("function")?, CppRole::Function);
+        assert_eq!(CppRole::from_str("functionParam")?, CppRole::FunctionParam);
+        assert_eq!(CppRole::from_str("templateParam")?, CppRole::TemplateParam);
+        assert_eq!(CppRole::from_str("member")?, CppRole::Member);
         Ok(())
     }
 }
