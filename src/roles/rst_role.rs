@@ -1,8 +1,13 @@
 use std::{fmt::Display, str::FromStr};
 
-use winnow::{ModalResult, Parser, error::StrContext, stream::AsChar, token::take_till};
+use winnow::{
+    ModalResult, Parser,
+    error::{ContextError, StrContext},
+    stream::AsChar,
+    token::take_till,
+};
 
-use crate::roles::{MalformedReference, SphinxType};
+use crate::roles::SphinxType;
 
 /// Describes a RST role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `rst:{role}`
@@ -30,21 +35,21 @@ impl Display for RstRole {
 /// Parses a cpp role as defined in [`RstRole`]
 /// may not contain whitespace but may contain other colons
 pub(crate) fn rst_role(input: &mut &str) -> ModalResult<SphinxType> {
-    let role = take_till(1.., |c| AsChar::is_space(c) || AsChar::is_newline(c))
+    let role = take_till(1.., AsChar::is_space)
         .context(StrContext::Label("rst role"))
         .parse_to::<RstRole>()
         .parse_next(input)?;
     Ok(SphinxType::ReStructuredText(role))
 }
 impl FromStr for RstRole {
-    type Err = MalformedReference;
+    type Err = ContextError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
             "directive:option" => Ok(RstRole::Option),
             "directive" => Ok(RstRole::Directive),
 
-            _ => Err(MalformedReference::InvalidRole(s.to_string())),
+            _ => Err(ContextError::new()),
         }
     }
 }

@@ -9,10 +9,11 @@
 //! but an effort has been made to make it more generally useful.
 //!
 //! ### Disclaimer
-//! The Sphinx inventory format doesn't have a formal specification
-//! instead what follows is just the rules that we (and other) have
+//! The Sphinx inventory format doesn't have a formal specification.
+//! What follows are just the rules that we (and others) have
 //! inferred from files we've seen in the wild. We try to be as correct as possible.
-//! That said, we can't be guaranteed to be correct. If you find any errors, please open an issue!
+//! That said, we can't be guaranteed to be correct. If you find any errors, or have a valid file we
+//! can't parse please open an issue!
 //!
 //! Currently only v2 is supported.
 //!
@@ -93,14 +94,12 @@
 //! ```
 //!
 //!
-//! Note that this will consume the buffer, and afterwards it should be left empty.
-//!
-//!
 //! ## Format Description
 //!
-//! ### General format description
 //! As noted by Skinn et al. currently, a inventory file (in the v2 format) has 2 parts:
 //! the header and the body.
+//!
+//! ### Header description
 //!
 //! The header needs to be of the following format:
 //! ```txt
@@ -155,17 +154,44 @@
 //! - Thank you to `BurntSushi` for writing the `csv` crate which has been a great example
 //!   to follow when designing the API
 
-pub mod error;
-pub mod readers;
-pub mod writers;
-
+mod error;
 mod header;
 mod priority;
+mod readers;
 mod reference;
 mod roles;
+mod writers;
 
+/// The main error type returned by this crate
+pub use error::SphinxInvError;
+
+/// Error type when parsing either the header or a record fails.
+pub use error::SphinxParseError;
+
+/// Error type when there is not enough input from the underlying reader
+/// to properly parse the header
+pub use error::MissingHeaderComponent;
+
+/// Struct for handling the metadata of an inventory such as project name and version
 pub use header::InventoryHeader;
-pub use readers::{PlainTextSphinxInventoryReader, SphinxInventoryReader};
+
+/// The main entrypoint to this crate, used to read and parse sphinx reference data
+pub use readers::SphinxInventoryReader;
+
+/// plaintext version of [`SphinxInventoryReader`] mainly used for testing and demoing
+pub use readers::PlainTextSphinxInventoryReader;
+
+/// The main data struct of this crate with the necessary information to link to external
 pub use reference::SphinxReference;
-pub use roles::*;
-pub use writers::{PlainTextSphinxInventoryWriter, SphinxInventoryWriter};
+
+/// The main entrypoint to this crate, used to write and format sphinx reference data
+pub use writers::SphinxInventoryWriter;
+
+/// plaintext version of [`SphinxInventoryWriter`] mainly used for testing and demoing
+pub use writers::PlainTextSphinxInventoryWriter;
+
+/// type used to parse `{domain}:{roles}` information provided by Sphinx used to disembguate
+/// between object types and names between different languages
+pub use roles::SphinxType;
+
+pub use roles::{CRole, CppRole, JsRole, MathRole, PyRole, RstRole, StdRole};

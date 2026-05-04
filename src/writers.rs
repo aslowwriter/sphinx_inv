@@ -117,7 +117,7 @@ str.lower py:method 1 library/stdtypes.html#str.lower str.lower
 
         writer.finalize(&mut cursor)?;
 
-        assert_eq!(String::from_utf8(write_buffer)?, expected);
+        assert_eq!(String::from_utf8(write_buffer).unwrap(), expected);
         Ok(())
     }
 

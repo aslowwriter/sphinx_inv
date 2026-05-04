@@ -22,8 +22,7 @@ pub use py_role::PyRole;
 pub use rst_role::RstRole;
 pub use std_role::StdRole;
 
-use crate::error::MalformedReference;
-use std::{fmt::Display, str::FromStr};
+use std::fmt::Display;
 
 #[derive(Debug, PartialEq)]
 pub enum SphinxType {
@@ -47,26 +46,6 @@ impl Display for SphinxType {
             SphinxType::Mathematics(math_role) => format!("math:{math_role}"),
             SphinxType::ReStructuredText(rst_role) => format!("rst:{rst_role}"),
         })
-    }
-}
-
-impl TryFrom<&str> for SphinxType {
-    type Error = MalformedReference;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value.split_once(':') {
-            Some((domain, role)) => match domain {
-                "std" => Ok(SphinxType::Std(StdRole::from_str(role)?)),
-                "c" => Ok(SphinxType::C(CRole::from_str(role)?)),
-                "cpp" => Ok(SphinxType::Cpp(CppRole::from_str(role)?)),
-                "py" => Ok(SphinxType::Python(PyRole::from_str(role)?)),
-                "js" => Ok(SphinxType::JavaScript(JsRole::from_str(role)?)),
-                "math" => Ok(SphinxType::Mathematics(MathRole::from_str(role)?)),
-                "rst" => Ok(SphinxType::ReStructuredText(RstRole::from_str(role)?)),
-                _ => Err(MalformedReference::InvalidDomain(domain.to_string())),
-            },
-            None => Err(MalformedReference::MalformedDomainField(value.to_string())),
-        }
     }
 }
 
