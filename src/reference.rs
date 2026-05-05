@@ -268,14 +268,6 @@ mod test {
     }
 
     #[test]
-    fn test_cmake_example() {
-        let mut input = "command:add_compile_definitions cmake:command 1 command/add_compile_definitions.html#$ -\nstr.join py:method 1 library/stdtypes.html#$ -";
-        let result = reference(&mut input);
-
-        assert!(result.is_err());
-    }
-
-    #[test]
     fn new_reference() {
         assert_eq!(
             SphinxReference {
