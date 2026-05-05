@@ -5,6 +5,7 @@ mod js_role;
 mod math_role;
 mod py_role;
 mod rst_role;
+mod sip_role;
 mod std_role;
 
 pub(crate) use c_role::c_role;
@@ -14,6 +15,7 @@ pub(crate) use js_role::js_role;
 pub(crate) use math_role::math_role;
 pub(crate) use py_role::py_role;
 pub(crate) use rst_role::rst_role;
+pub(crate) use sip_role::sip_role;
 pub(crate) use std_role::std_role;
 
 pub use c_role::CRole;
@@ -32,7 +34,7 @@ use winnow::{
 
 use std::fmt::Display;
 
-use crate::reference::word;
+use crate::{reference::word, roles::sip_role::SipRole};
 
 #[derive(Debug, PartialEq)]
 pub enum SphinxType {
@@ -44,6 +46,7 @@ pub enum SphinxType {
     Mathematics(MathRole),
     ReStructuredText(RstRole),
     Cmake(CmakeRole),
+    Sip(SipRole),
 }
 
 impl Display for SphinxType {
@@ -57,6 +60,7 @@ impl Display for SphinxType {
             SphinxType::Mathematics(math_role) => format!("math:{math_role}"),
             SphinxType::ReStructuredText(rst_role) => format!("rst:{rst_role}"),
             SphinxType::Cmake(cmake_role) => format!("cmake:{cmake_role}"),
+            SphinxType::Sip(sip_role) => format!("sip:{sip_role}"),
         })
     }
 }
@@ -87,6 +91,7 @@ pub(crate) fn role_domain(input: &mut &str) -> ModalResult<SphinxType> {
         "js" => cut_err(js_role),
         "math" => cut_err(math_role),
         "cmake" => cut_err(cmake_role),
+        "sip" => cut_err(sip_role),
         _ => fail
     }
     .parse_next(input)
@@ -365,6 +370,26 @@ mod test {
     #[test]
     fn parse_rst_roles() -> Result<(), SphinxParseError> {
         let roles = vec!["rst:directive", "rst:directive:option", "rst:role"];
+        for role in roles {
+            let _ = role_domain
+                .parse(role)
+                .map_err(|e| SphinxParseError::from_str_parse(&e, 0))?;
+        }
+
+        Ok(())
+    }
+    #[test]
+    fn parse_sip_role() -> Result<(), SphinxParseError> {
+        let roles = vec![
+            "sip:method",
+            "sip:member",
+            "sip:class",
+            "sip:signal",
+            "sip:module",
+            "sip:attribute",
+            "sip:enum",
+        ];
+
         for role in roles {
             let _ = role_domain
                 .parse(role)
