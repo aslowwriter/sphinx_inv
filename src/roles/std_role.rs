@@ -22,11 +22,21 @@ pub enum StdRole {
 
     Pdbcommand,
 
+    Confval,
+
     Token,
+
+    Title,
+
+    Option,
 
     Opcode,
 
     MonitoringEvent,
+
+    Psivar,
+
+    Event,
 
     /// Describes an environment variable that the documented code
     /// or program uses or defines
@@ -37,6 +47,8 @@ impl Display for StdRole {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
             StdRole::Doc => "doc",
+            StdRole::Title => "title",
+            StdRole::Event => "event",
             StdRole::Label => "label",
             StdRole::Term => "term",
             StdRole::Cmdoption => "cmdoption",
@@ -45,6 +57,9 @@ impl Display for StdRole {
             StdRole::Opcode => "opcode",
             StdRole::MonitoringEvent => "monitoring-event",
             StdRole::Envvar => "envvar",
+            StdRole::Psivar => "psyvar",
+            StdRole::Confval => "confval",
+            StdRole::Option => "option",
         })
     }
 }
@@ -56,6 +71,7 @@ impl FromStr for StdRole {
         match s {
             "doc" => Ok(StdRole::Doc),
             "label" => Ok(StdRole::Label),
+            "title" => Ok(StdRole::Title),
             "term" => Ok(StdRole::Term),
             "cmdoption" => Ok(StdRole::Cmdoption),
             "pdbcommand" => Ok(StdRole::Pdbcommand),
@@ -63,6 +79,10 @@ impl FromStr for StdRole {
             "token" => Ok(StdRole::Token),
             "monitoring-event" => Ok(StdRole::MonitoringEvent),
             "envvar" => Ok(StdRole::Envvar),
+            "psivar" => Ok(StdRole::Psivar),
+            "confval" => Ok(StdRole::Confval),
+            "event" => Ok(StdRole::Event),
+            "option" => Ok(StdRole::Option),
 
             _ => Err(ContextError::new()),
         }

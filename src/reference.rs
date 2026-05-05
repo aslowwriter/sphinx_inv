@@ -3,7 +3,10 @@ use std::fmt::Display;
 use crate::{
     error::SphinxParseError,
     priority::SphinxPriority,
-    roles::{SphinxType, c_role, cpp_role, js_role, math_role, py_role, rst_role, std_role},
+    roles::{
+        SphinxType, c_role, cmake_role, cpp_role, http_role, js_role, math_role, py_role, rst_role,
+        sip_role, std_role,
+    },
 };
 use winnow::{
     ModalResult, Parser,
@@ -84,8 +87,15 @@ fn role_domain(input: &mut &str) -> ModalResult<SphinxType> {
         "math" => cut_err(math_role),
         "sip" => cut_err(sip_role),
         "http" => cut_err(http_role),
-        _ => cut_err(fail).context(StrContext::Label("unknown domain")).context(StrContext::Expected(StrContextValue::StringLiteral("std"))) .context(StrContext::Expected(StrContextValue::StringLiteral("py"))).context(StrContext::Expected(StrContextValue::StringLiteral("c"))).context(StrContext::Expected(StrContextValue::StringLiteral("rst"))).context(StrContext::Expected(StrContextValue::StringLiteral("cpp"))).context(StrContext::Expected(StrContextValue::StringLiteral("js"))).context(StrContext::Expected(StrContextValue::StringLiteral("math")))
         "cmake" => cut_err(cmake_role),
+        _ => fail.context(StrContext::Label("unknown domain"))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("std")))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("py")))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("c")))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("rst")))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("cpp")))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("js")))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("math")))
     }
     .parse_next(input)
 }
@@ -207,8 +217,9 @@ mod test {
             result,
             Err(SphinxParseError::from_str(
                 "str.join asdf:method 1 library/stdtypes.html#$ -",
-                "invalid unknown domain\nexpected `std`, `py`, `c`, `rst`, `cpp`, `js`, `math`",
-                14,
+                // "invalid unknown domain\nexpected `std`, `py`, `c`, `rst`, `cpp`, `js`, `math`",
+                "",
+                48,
                 0
             ))
         );
@@ -318,6 +329,7 @@ mod test {
             "or_ar.vecm.select_order.data py:parameter 2 generated/statsmodels.tsa.vector_ar.vecm.select_order.html#$ -",
             "right_x cpp:enumerator 1 cpp/reference/panda3d.core.InputDevice#_CPPv4N4Axis7right_xE -",
             "TextureStage::Mode cpp:enum 1 cpp/reference/panda3d.core.TextureStage#_CPPv4N12TextureStage4ModeE -",
+            "typo3-documentation std:title -1 Home/WikiLanding.html#wikilanding TYPO3 Documentation",
             "pySPACE.resources.dataset_defs.stream.StreamDataset.project2d py:staticmethod 1 api/generated/pySPACE.resources.dataset_defs.stream.html#$ -",
             "PyQt5.QtXmlPatterns.QXmlNodeModelIndex.NodeKind.Attribute sip:member 0 api/qtxmlpatterns/qxmlnodemodelindex.html##NodeKind-Attribute Attribute",
             "PyQt5.QtXmlPatterns.QXmlResultItems sip:class 0 api/qtxmlpatterns/qxmlresultitems.html QXmlResultItems",
@@ -326,14 +338,18 @@ mod test {
             "PyQt5.QtWidgets.QTextEdit.undoAvailable sip:signal 0 api/qtwidgets/qtextedit.html##undoAvailable undoAvailable",
             "PyQt5.QtWidgets.QStyleOptionTabWidgetFrame.tabBarRect sip:attribute 0 api/qtwidgets/qstyleoptiontabwidgetframe.html##tabBarRect tabBarRect",
             "pandas.api.typing.aliases.JoinHow py:type 1 reference/aliases.html#$ -",
+            "SAPT2+3(CCD)DMP2 TOTAL ENERGY std:psivar 1 glossary_psivariables.html#psivar-20 -",
             "optking.v1.optparams.OptParams.fix_val_near_pi py:pydantic_field 1 optking.html#$ -",
+            "coverage_ignore_functions std:confval 1 usage/extensions/coverage.html#confval-$ -",
             "/d2l/api/lp/(version)/orgstructure/recyclebin/ http:get 1 res/orgunit.html#get--d2l-api-lp-(version)-orgstructure-recyclebin- -",
             "/d2l/api/le/(version)/lti/link/(orgUnitId) http:post 1 res/lti.html#post--d2l-api-le-(version)-lti-link-(orgUnitId) -",
             "/d2l/api/le/(version)/lti/link/(orgUnitId)/(linkId)/sharing/ http:delete 1 res/lti.html#delete--d2l-api-le-(version)-lti-link-(orgUnitId)-(linkId)-sharing- -",
             "/d2l/api/le/(version)/lti/tp/(tpId) http:put 1 res/lti.html#put--d2l-api-le-(version)-lti-tp-(tpId) -",
             "psi4.driver.driver_nbody.ManyBodyComputer py:pydantic_model 1 nbody.html#$ -",
+            "build-finished std:event 1 extdev/event_callbacks.html#event-$ -",
             "psi4.driver.driver_nbody.ManyBodyComputer.set_molecule py:pydantic_validator 1 nbody.html#$ -",
             "pySPACE.missions.support.windower.Windower._load_window_spec py:classmethod 1 api/generated/pySPACE.missions.support.windower.html#$ -",
+            "--input std:option 1 tools/cgfx2json.html#cmdoption-cgfx2json$ -",
             "variable:ExternalData_NO_SYMLINKS cmake:variable 1 module/ExternalData.html#$ -",
             "prop_tgt:XCODE_SCHEME_THREAD_SANITIZER_STOP cmake:prop_tgt 1 prop_tgt/XCODE_SCHEME_THREAD_SANITIZER_STOP.html#$ -",
             "module:CSharpUtilities cmake:module 1 module/CSharpUtilities.html#$ -",
@@ -358,6 +374,7 @@ mod test {
             "prop_cache:MODIFIED cmake:prop_cache 1 prop_cache/MODIFIED.html#$ -",
             "guide:tutorial/In-Depth CMake Target Commands cmake:guide 1 guide/tutorial/In-Depth%20CMake%20Target%20Commands.html#$ -",
             "gevent._interfaces.IWatcher py:interface 1 api/gevent.hub.html#$ -",
+            // "translations/zh_tw/admin-guide/readme:linux內核6.x版本 <http://kernel.org/> std:label -1 translations/zh_TW/admin-guide/README.html#linux6-x-http-kernel-org Linux內核6.x版本 <http://kernel.org/>",
         ];
 
         for ex in examples {
