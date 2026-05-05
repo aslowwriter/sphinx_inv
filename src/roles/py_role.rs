@@ -14,9 +14,12 @@ use crate::roles::SphinxType;
 /// if you would like one added please open a feature request
 #[derive(Debug, PartialEq)]
 pub enum PyRole {
+    Parameter,
+
     /// Describes an object data attribute
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-attribute)
     Attribute,
+    Attr,
 
     /// References a module-level python variable.
     /// `Type` should be used for type aliases and `Attribute` for class variables
@@ -27,6 +30,22 @@ pub enum PyRole {
     /// A python class describing an exception that can be thrown
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-exception)
     Exception,
+
+    /// A static method, aka one that does not take `self` as it's first argument
+    /// see also [the python docs](https://docs.python.org/3/library/functions.html#staticmethod)
+    Staticmethod,
+
+    /// A python enum, aka a fixed collection of possible values.
+    /// see also [the python docs](https://docs.python.org/3/library/enum.html#enum.Enum)
+    Enum,
+
+    /// An attribute of a pydantic model and it's associated validators
+    /// see also [the pydantic docs](https://pydantic.dev/docs/validation/latest/concepts/fields/)
+    PydanticField,
+
+    /// A validator for a pydantic model field to validate its data
+    /// see also [the pydantic docs](https://pydantic.dev/docs/validation/latest/concepts/validators/)
+    PydanticValidator,
 
     /// Describes a type alias
     /// see also [the sphix docs](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-type)
@@ -55,19 +74,42 @@ pub enum PyRole {
     /// A python class
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-method)
     Class,
+
+    /// A class method, aka a function on a class object rather than any particular instance of that
+    /// class
+    /// see also [the python docs](https://docs.python.org/3/library/functions.html#classmethod)
+    Classmethod,
+
+    /// A pydantic model, a data class designed to hold validated data
+    /// see also [the pydantic docs](https://pydantic.dev/docs/validation/latest/concepts/models/)
+    PydanticModel,
+
+    /// python doesn't actually have interfaces, so I'm not sure what this means...
+    /// I did find it in the wild though so I added it here.
+    Interface,
 }
+
 impl Display for PyRole {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
             PyRole::Attribute => "attribute",
+            PyRole::Attr => "attr",
+            PyRole::Staticmethod => "staticmethod",
+            PyRole::Parameter => "parameter",
             PyRole::Data => "data",
             PyRole::Exception => "exception",
             PyRole::Type => "type",
             PyRole::Function => "function",
             PyRole::Method => "method",
             PyRole::Module => "module",
+            PyRole::Classmethod => "classmethod",
             PyRole::Property => "property",
             PyRole::Class => "class",
+            PyRole::PydanticField => "pydantic_field",
+            PyRole::PydanticValidator => "pydantic_validator",
+            PyRole::PydanticModel => "pydantic_model",
+            PyRole::Enum => "enum",
+            PyRole::Interface => "interface",
         })
     }
 }
@@ -76,14 +118,24 @@ impl FromStr for PyRole {
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
+            "attr" => Ok(PyRole::Attr),
             "attribute" => Ok(PyRole::Attribute),
+            "class" => Ok(PyRole::Class),
+            "classmethod" => Ok(PyRole::Classmethod),
             "data" => Ok(PyRole::Data),
+            "enum" => Ok(PyRole::Enum),
             "exception" => Ok(PyRole::Exception),
             "function" => Ok(PyRole::Function),
+            "interface" => Ok(PyRole::Interface),
             "method" => Ok(PyRole::Method),
             "module" => Ok(PyRole::Module),
+            "parameter" => Ok(PyRole::Parameter),
             "property" => Ok(PyRole::Property),
-            "class" => Ok(PyRole::Class),
+            "pydantic_field" => Ok(PyRole::PydanticField),
+            "pydantic_model" => Ok(PyRole::PydanticModel),
+            "pydantic_validator" => Ok(PyRole::PydanticValidator),
+            "staticmethod" => Ok(PyRole::Staticmethod),
+            "type" => Ok(PyRole::Type),
 
             _ => Err(ContextError::new()),
         }
