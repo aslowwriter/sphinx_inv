@@ -88,14 +88,7 @@ fn role_domain(input: &mut &str) -> ModalResult<SphinxType> {
         "sip" => cut_err(sip_role),
         "http" => cut_err(http_role),
         "cmake" => cut_err(cmake_role),
-        _ => fail.context(StrContext::Label("unknown domain"))
-            .context(StrContext::Expected(StrContextValue::StringLiteral("std")))
-            .context(StrContext::Expected(StrContextValue::StringLiteral("py")))
-            .context(StrContext::Expected(StrContextValue::StringLiteral("c")))
-            .context(StrContext::Expected(StrContextValue::StringLiteral("rst")))
-            .context(StrContext::Expected(StrContextValue::StringLiteral("cpp")))
-            .context(StrContext::Expected(StrContextValue::StringLiteral("js")))
-            .context(StrContext::Expected(StrContextValue::StringLiteral("math")))
+        _ => fail
     }
     .parse_next(input)
 }
@@ -337,6 +330,7 @@ mod test {
             "PyQt5.QtWinExtras.QtWin.WindowFlip3DPolicy sip:enum 0 api/qtwinextras/qtwin.html##WindowFlip3DPolicy WindowFlip3DPolicy",
             "PyQt5.QtWidgets.QTextEdit.undoAvailable sip:signal 0 api/qtwidgets/qtextedit.html##undoAvailable undoAvailable",
             "PyQt5.QtWidgets.QStyleOptionTabWidgetFrame.tabBarRect sip:attribute 0 api/qtwidgets/qstyleoptiontabwidgetframe.html##tabBarRect tabBarRect",
+            "easybuild.tools.toolchain.toolchain.Toolchain.search_path_vars_linker py:attr 1 api/easybuild/tools/toolchain/toolchain/#$ -",
             "pandas.api.typing.aliases.JoinHow py:type 1 reference/aliases.html#$ -",
             "SAPT2+3(CCD)DMP2 TOTAL ENERGY std:psivar 1 glossary_psivariables.html#psivar-20 -",
             "optking.v1.optparams.OptParams.fix_val_near_pi py:pydantic_field 1 optking.html#$ -",
@@ -374,6 +368,8 @@ mod test {
             "prop_cache:MODIFIED cmake:prop_cache 1 prop_cache/MODIFIED.html#$ -",
             "guide:tutorial/In-Depth CMake Target Commands cmake:guide 1 guide/tutorial/In-Depth%20CMake%20Target%20Commands.html#$ -",
             "gevent._interfaces.IWatcher py:interface 1 api/gevent.hub.html#$ -",
+            "py:meth rst:role 1 usage/domains/python.html#role-py-meth -",
+            "VisitsAllContentTopicsData js:attribute 1 res/releaseconditions.html#$ -",
             // "translations/zh_tw/admin-guide/readme:linux內核6.x版本 <http://kernel.org/> std:label -1 translations/zh_TW/admin-guide/README.html#linux6-x-http-kernel-org Linux內核6.x版本 <http://kernel.org/>",
         ];
 

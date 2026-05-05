@@ -342,8 +342,9 @@ str.lower asdf:method 1 library/stdtypes.html#$ -
             inv_reader.next(),
             Some(Err(SphinxParseError::from_str(
                 "str.join asdf:method 1 library/stdtypes.html#$ -",
-                "invalid unknown domain\nexpected `std`, `py`, `c`, `rst`, `cpp`, `js`, `math`",
-                14,
+                // "invalid unknown domain\nexpected `std`, `py`, `c`, `rst`, `cpp`, `js`, `math`",
+                "",
+                48,
                 6
             )
             .into()))
@@ -386,8 +387,9 @@ str.lower asdf:method 1 library/stdtypes.html#$ -
             inv_reader.next(),
             Some(Err(SphinxParseError::from_str(
                 "str.lower asdf:method 1 library/stdtypes.html#$ -",
-                "invalid unknown domain\nexpected `std`, `py`, `c`, `rst`, `cpp`, `js`, `math`",
-                15,
+                // "invalid unknown domain\nexpected `std`, `py`, `c`, `rst`, `cpp`, `js`, `math`",
+                "",
+                49,
                 10
             )
             .into()))
