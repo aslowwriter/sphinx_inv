@@ -3,13 +3,12 @@ use std::fmt::Display;
 use crate::{
     error::SphinxParseError,
     priority::SphinxPriority,
-    roles::{SphinxType, c_role, cpp_role, js_role, math_role, py_role, rst_role, std_role},
+    roles::{SphinxType, role_domain},
 };
 use winnow::{
     ModalResult, Parser,
     ascii::{space1, till_line_ending},
-    combinator::{alt, cut_err, dispatch, fail, preceded, repeat_till, terminated, trace},
-    error::{StrContext, StrContextValue},
+    combinator::{alt, preceded, repeat_till, trace},
     stream::AsChar,
     token::take_while,
 };
@@ -51,7 +50,7 @@ impl Display for SphinxReference {
     }
 }
 
-fn word<'s>(input: &mut &'s str) -> ModalResult<&'s str> {
+pub(crate) fn word<'s>(input: &mut &'s str) -> ModalResult<&'s str> {
     take_while(1.., |c| {
         (AsChar::is_alphanum(c) || c == '_') && !AsChar::is_newline(c)
     })
@@ -66,24 +65,6 @@ fn non_word<'s>(input: &mut &'s str) -> ModalResult<&'s str> {
     take_while(1.., |c| {
         !(AsChar::is_alphanum(c) || c == '_' || AsChar::is_newline(c))
     })
-    .parse_next(input)
-}
-
-fn domain<'s>(input: &mut &'s str) -> ModalResult<&'s str> {
-    trace("domain", word).parse_next(input)
-}
-
-fn role_domain(input: &mut &str) -> ModalResult<SphinxType> {
-    dispatch! {terminated(domain,':');
-        "std" => cut_err(std_role),
-        "py" => cut_err(py_role),
-        "c" => cut_err(c_role),
-        "rst" => cut_err(rst_role),
-        "cpp" => cut_err(cpp_role),
-        "js" => cut_err(js_role),
-        "math" => cut_err(math_role),
-        _ => cut_err(fail).context(StrContext::Label("unknown domain")).context(StrContext::Expected(StrContextValue::StringLiteral("std"))) .context(StrContext::Expected(StrContextValue::StringLiteral("py"))).context(StrContext::Expected(StrContextValue::StringLiteral("c"))).context(StrContext::Expected(StrContextValue::StringLiteral("rst"))).context(StrContext::Expected(StrContextValue::StringLiteral("cpp"))).context(StrContext::Expected(StrContextValue::StringLiteral("js"))).context(StrContext::Expected(StrContextValue::StringLiteral("math")))
-    }
     .parse_next(input)
 }
 

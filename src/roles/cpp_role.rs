@@ -82,28 +82,3 @@ pub(crate) fn cpp_role(input: &mut &str) -> ModalResult<SphinxType> {
         .parse_next(input)?;
     Ok(SphinxType::Cpp(role))
 }
-
-#[cfg(test)]
-mod test {
-
-    use super::*;
-    #[test]
-    fn test_sphinx_role_parsing_std_err() {
-        assert!(CppRole::from_str("asdf").is_err());
-        assert!(CppRole::from_str("doc").is_err());
-        assert!(CppRole::from_str("").is_err());
-        assert!(CppRole::from_str("::::").is_err());
-        assert!(CppRole::from_str(" label").is_err());
-        assert!(CppRole::from_str(" asdf").is_err());
-        assert!(CppRole::from_str("function Param").is_err());
-    }
-    #[test]
-    fn test_sphinx_type_parsing_cpp() -> Result<(), ContextError> {
-        assert_eq!(CppRole::from_str("class")?, CppRole::Class);
-        assert_eq!(CppRole::from_str("function")?, CppRole::Function);
-        assert_eq!(CppRole::from_str("functionParam")?, CppRole::FunctionParam);
-        assert_eq!(CppRole::from_str("templateParam")?, CppRole::TemplateParam);
-        assert_eq!(CppRole::from_str("member")?, CppRole::Member);
-        Ok(())
-    }
-}

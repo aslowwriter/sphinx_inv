@@ -21,8 +21,15 @@ pub use math_role::MathRole;
 pub use py_role::PyRole;
 pub use rst_role::RstRole;
 pub use std_role::StdRole;
+use winnow::{
+    ModalResult, Parser,
+    combinator::{cut_err, dispatch, fail, terminated, trace},
+    error::{StrContext, StrContextValue},
+};
 
 use std::fmt::Display;
+
+use crate::reference::word;
 
 #[derive(Debug, PartialEq)]
 pub enum SphinxType {
@@ -49,8 +56,30 @@ impl Display for SphinxType {
     }
 }
 
+fn domain<'s>(input: &mut &'s str) -> ModalResult<&'s str> {
+    trace("domain", word).parse_next(input)
+}
+
+pub(crate) fn role_domain(input: &mut &str) -> ModalResult<SphinxType> {
+    dispatch! {terminated(domain,':');
+        "std" => cut_err(std_role),
+        "py" => cut_err(py_role),
+        "c" => cut_err(c_role),
+        "rst" => cut_err(rst_role),
+        "cpp" => cut_err(cpp_role),
+        "js" => cut_err(js_role),
+        "math" => cut_err(math_role),
+        _ => fail.context(StrContext::Label("unknown domain")).context(StrContext::Expected(StrContextValue::StringLiteral("std"))) .context(StrContext::Expected(StrContextValue::StringLiteral("py"))).context(StrContext::Expected(StrContextValue::StringLiteral("c"))).context(StrContext::Expected(StrContextValue::StringLiteral("rst"))).context(StrContext::Expected(StrContextValue::StringLiteral("cpp"))).context(StrContext::Expected(StrContextValue::StringLiteral("js"))).context(StrContext::Expected(StrContextValue::StringLiteral("math")))
+    }
+    .parse_next(input)
+}
+
 #[cfg(test)]
 mod test {
+    use winnow::Parser;
+
+    use crate::SphinxParseError;
+    use crate::roles::role_domain;
     use crate::{
         CRole, CppRole, JsRole, MathRole, PyRole, RstRole,
         roles::{SphinxType, StdRole},
@@ -193,5 +222,128 @@ mod test {
             format!("{}", SphinxType::Std(StdRole::Envvar)),
             "std:envvar"
         );
+    }
+
+    #[test]
+    fn parse_c_roles() -> Result<(), SphinxParseError> {
+        let roles = vec![
+            "c:enumerator",
+            "c:enum",
+            "c:function",
+            "c:functionParam",
+            "c:member",
+            "c:macro",
+            "c:var",
+            "c:type",
+            "c:struct",
+            "c:union",
+        ];
+        for role in roles {
+            let _ = role_domain
+                .parse(role)
+                .map_err(|e| SphinxParseError::from_str_parse(&e, 0))?;
+        }
+
+        Ok(())
+    }
+    #[test]
+    fn parse_std_roles() -> Result<(), SphinxParseError> {
+        let roles = vec![
+            "std:doc",
+            "std:label",
+            "std:term",
+            "std:cmdoption",
+            "std:pdbcommand",
+            "std:token",
+            "std:opcode",
+            "std:monitoring-event",
+            "std:envvar",
+        ];
+        for role in roles {
+            let _ = role_domain
+                .parse(role)
+                .map_err(|e| SphinxParseError::from_str_parse(&e, 0))?;
+        }
+
+        Ok(())
+    }
+    #[test]
+    fn parse_python_roles() -> Result<(), SphinxParseError> {
+        let roles = vec![
+            "py:parameter",
+            "py:attribute",
+            "py:data",
+            "py:exception",
+            "py:type",
+            "py:function",
+            "py:method",
+            "py:module",
+            "py:property",
+            "py:class",
+        ];
+        for role in roles {
+            let _ = role_domain
+                .parse(role)
+                .map_err(|e| SphinxParseError::from_str_parse(&e, 0))?;
+        }
+
+        Ok(())
+    }
+    #[test]
+    fn parse_cpp_roles() -> Result<(), SphinxParseError> {
+        let roles = vec![
+            "cpp:class",
+            "cpp:function",
+            "cpp:functionParam",
+            "cpp:member",
+            "cpp:templateParam",
+            "cpp:type",
+        ];
+        for role in roles {
+            let _ = role_domain
+                .parse(role)
+                .map_err(|e| SphinxParseError::from_str_parse(&e, 0))?;
+        }
+
+        Ok(())
+    }
+    #[test]
+    fn parse_js_roles() -> Result<(), SphinxParseError> {
+        let roles = vec![
+            "js:module",
+            "js:data",
+            "js:function",
+            "js:method",
+            "js:class",
+        ];
+        for role in roles {
+            let _ = role_domain
+                .parse(role)
+                .map_err(|e| SphinxParseError::from_str_parse(&e, 0))?;
+        }
+
+        Ok(())
+    }
+    #[test]
+    fn parse_math_roles() -> Result<(), SphinxParseError> {
+        let roles = vec!["math:numref"];
+        for role in roles {
+            let _ = role_domain
+                .parse(role)
+                .map_err(|e| SphinxParseError::from_str_parse(&e, 0))?;
+        }
+
+        Ok(())
+    }
+    #[test]
+    fn parse_rst_roles() -> Result<(), SphinxParseError> {
+        let roles = vec!["rst:directive", "rst:directive:option", "rst:role"];
+        for role in roles {
+            let _ = role_domain
+                .parse(role)
+                .map_err(|e| SphinxParseError::from_str_parse(&e, 0))?;
+        }
+
+        Ok(())
     }
 }

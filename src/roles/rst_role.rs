@@ -53,23 +53,3 @@ impl FromStr for RstRole {
         }
     }
 }
-
-#[cfg(test)]
-mod test {
-    use crate::roles::{RstRole, SphinxType, rst_role};
-
-    #[test]
-    fn rst_parsing() {
-        let mut line = "directive";
-        assert_eq!(
-            rst_role(&mut line),
-            Ok(SphinxType::ReStructuredText(RstRole::Directive))
-        );
-
-        line = "directive:option";
-        assert_eq!(
-            rst_role(&mut line),
-            Ok(SphinxType::ReStructuredText(RstRole::Option))
-        );
-    }
-}

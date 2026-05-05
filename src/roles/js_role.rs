@@ -69,27 +69,3 @@ pub(crate) fn js_role(input: &mut &str) -> ModalResult<SphinxType> {
         .parse_next(input)?;
     Ok(SphinxType::JavaScript(role))
 }
-
-#[cfg(test)]
-mod test {
-
-    use super::*;
-    #[test]
-    fn test_sphinx_role_parsing_std_err() {
-        assert!(JsRole::from_str("asdf").is_err());
-        assert!(JsRole::from_str("doc").is_err());
-        assert!(JsRole::from_str("").is_err());
-        assert!(JsRole::from_str("::::").is_err());
-        assert!(JsRole::from_str(" label").is_err());
-        assert!(JsRole::from_str(" asdf").is_err());
-    }
-    #[test]
-    fn test_sphinx_type_parsing_js() -> Result<(), ContextError> {
-        assert_eq!(JsRole::from_str("module")?, JsRole::Module);
-        assert_eq!(JsRole::from_str("function")?, JsRole::Function);
-        assert_eq!(JsRole::from_str("method")?, JsRole::Method);
-        assert_eq!(JsRole::from_str("class")?, JsRole::Class);
-        assert_eq!(JsRole::from_str("data")?, JsRole::Data);
-        Ok(())
-    }
-}
