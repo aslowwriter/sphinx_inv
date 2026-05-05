@@ -83,6 +83,7 @@ fn role_domain(input: &mut &str) -> ModalResult<SphinxType> {
         "js" => cut_err(js_role),
         "math" => cut_err(math_role),
         _ => cut_err(fail).context(StrContext::Label("unknown domain")).context(StrContext::Expected(StrContextValue::StringLiteral("std"))) .context(StrContext::Expected(StrContextValue::StringLiteral("py"))).context(StrContext::Expected(StrContextValue::StringLiteral("c"))).context(StrContext::Expected(StrContextValue::StringLiteral("rst"))).context(StrContext::Expected(StrContextValue::StringLiteral("cpp"))).context(StrContext::Expected(StrContextValue::StringLiteral("js"))).context(StrContext::Expected(StrContextValue::StringLiteral("math")))
+        "cmake" => cut_err(cmake_role),
     }
     .parse_next(input)
 }
@@ -287,14 +288,6 @@ mod test {
     }
 
     #[test]
-    fn test_cmake_example() {
-        let mut input = "command:add_compile_definitions cmake:command 1 command/add_compile_definitions.html#$ -\nstr.join py:method 1 library/stdtypes.html#$ -";
-        let result = reference(&mut input);
-
-        assert!(result.is_err());
-    }
-
-    #[test]
     fn new_reference() {
         assert_eq!(
             SphinxReference {
@@ -329,9 +322,25 @@ mod test {
             "psi4.driver.driver_nbody.ManyBodyComputer py:pydantic_model 1 nbody.html#$ -",
             "psi4.driver.driver_nbody.ManyBodyComputer.set_molecule py:pydantic_validator 1 nbody.html#$ -",
             "pySPACE.missions.support.windower.Windower._load_window_spec py:classmethod 1 api/generated/pySPACE.missions.support.windower.html#$ -",
+            "variable:ExternalData_NO_SYMLINKS cmake:variable 1 module/ExternalData.html#$ -",
+            "prop_tgt:XCODE_SCHEME_THREAD_SANITIZER_STOP cmake:prop_tgt 1 prop_tgt/XCODE_SCHEME_THREAD_SANITIZER_STOP.html#$ -",
+            "module:CSharpUtilities cmake:module 1 module/CSharpUtilities.html#$ -",
+            "policy:CMP0187 cmake:policy 1 policy/CMP0187.html#$ -",
+            "command:qt4_generate_moc cmake:command 1 module/FindQt4.html#$ -",
+            "prop_gbl:CMAKE_ROLE cmake:prop_gbl 1 prop_gbl/CMAKE_ROLE.html#$ -",
+            "prop_dir:CACHE_VARIABLES cmake:prop_dir 1 prop_dir/CACHE_VARIABLES.html#$ -",
+            "manual:cpack(1) cmake:manual 1 manual/cpack.1.html#$ -",
+            "prop_test:RUN_SERIAL cmake:prop_test 1 prop_test/RUN_SERIAL.html#$ -",
+            "genex:VERSION_GREATER cmake:genex 1 manual/cmake-generator-expressions.7.html#$ -",
+            "generator:CodeLite cmake:generator 1 generator/CodeLite.html#$ -",
+            "envvar:RC cmake:envvar 1 envvar/RC.html#$ -",
+            "cpack_gen:CPack DEB Generator cmake:cpack_gen 1 cpack_gen/deb.html#$ -",
+            "prop_sf:Fortran_FORMAT cmake:prop_sf 1 prop_sf/Fortran_FORMAT.html#$ -",
             "Data::@data cpp:union 1 usage/domains/cpp.html#_CPPv4N4DataUt4_dataE Data::[anonymous]",
             "td::Iterator cpp:concept 1 usage/domains/cpp.html#_CPPv4I0ENSt8IteratorE -",
             "pyvista.plotting.opts.RepresentationType py:enum 1 api/plotting/_autosummary/pyvista.plotting.opts.RepresentationType.html#$ -",
+            "prop_cache:MODIFIED cmake:prop_cache 1 prop_cache/MODIFIED.html#$ -",
+            "guide:tutorial/In-Depth CMake Target Commands cmake:guide 1 guide/tutorial/In-Depth%20CMake%20Target%20Commands.html#$ -",
             "gevent._interfaces.IWatcher py:interface 1 api/gevent.hub.html#$ -",
         ];
 
