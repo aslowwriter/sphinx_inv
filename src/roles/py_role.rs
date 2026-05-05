@@ -14,9 +14,12 @@ use crate::roles::SphinxType;
 /// if you would like one added please open a feature request
 #[derive(Debug, PartialEq)]
 pub enum PyRole {
+    Parameter,
+
     /// Describes an object data attribute
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-attribute)
     Attribute,
+    Attr,
 
     /// References a module-level python variable.
     /// `Type` should be used for type aliases and `Attribute` for class variables
@@ -27,6 +30,14 @@ pub enum PyRole {
     /// A python class describing an exception that can be thrown
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-exception)
     Exception,
+
+    Staticmethod,
+
+    Enum,
+
+    PydanticField,
+
+    PydanticValidator,
 
     /// Describes a type alias
     /// see also [the sphix docs](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-type)
@@ -55,19 +66,34 @@ pub enum PyRole {
     /// A python class
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-method)
     Class,
+
+    Classmethod,
+
+    PydanticModel,
+    Interface,
 }
+
 impl Display for PyRole {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
             PyRole::Attribute => "attribute",
+            PyRole::Attr => "attr",
+            PyRole::Staticmethod => "staticmethod",
+            PyRole::Parameter => "parameter",
             PyRole::Data => "data",
             PyRole::Exception => "exception",
             PyRole::Type => "type",
             PyRole::Function => "function",
             PyRole::Method => "method",
             PyRole::Module => "module",
+            PyRole::Classmethod => "classmethod",
             PyRole::Property => "property",
             PyRole::Class => "class",
+            PyRole::PydanticField => "pydantic_field",
+            PyRole::PydanticValidator => "pydantic_validator",
+            PyRole::PydanticModel => "pydantic_model",
+            PyRole::Enum => "enum",
+            PyRole::Interface => "interface",
         })
     }
 }
@@ -77,13 +103,23 @@ impl FromStr for PyRole {
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
             "attribute" => Ok(PyRole::Attribute),
+            "attr" => Ok(PyRole::Attr),
+            "staticmethod" => Ok(PyRole::Staticmethod),
             "data" => Ok(PyRole::Data),
             "exception" => Ok(PyRole::Exception),
             "function" => Ok(PyRole::Function),
             "method" => Ok(PyRole::Method),
+            "type" => Ok(PyRole::Type),
+            "pydantic_field" => Ok(PyRole::PydanticField),
             "module" => Ok(PyRole::Module),
             "property" => Ok(PyRole::Property),
+            "parameter" => Ok(PyRole::Parameter),
             "class" => Ok(PyRole::Class),
+            "classmethod" => Ok(PyRole::Classmethod),
+            "pydantic_model" => Ok(PyRole::PydanticModel),
+            "pydantic_validator" => Ok(PyRole::PydanticValidator),
+            "enum" => Ok(PyRole::Enum),
+            "interface" => Ok(PyRole::Interface),
 
             _ => Err(ContextError::new()),
         }

@@ -21,6 +21,8 @@ pub enum RstRole {
     /// Describes an option for a reStructuredText directive
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/restructuredtext.html#directive-rst-directive-option)
     Option,
+
+    Role,
 }
 
 impl Display for RstRole {
@@ -28,6 +30,7 @@ impl Display for RstRole {
         f.write_str(match self {
             RstRole::Directive => "directive",
             RstRole::Option => "directive:option",
+            RstRole::Role => "role",
         })
     }
 }
@@ -48,6 +51,7 @@ impl FromStr for RstRole {
         match s {
             "directive:option" => Ok(RstRole::Option),
             "directive" => Ok(RstRole::Directive),
+            "role" => Ok(RstRole::Role),
 
             _ => Err(ContextError::new()),
         }

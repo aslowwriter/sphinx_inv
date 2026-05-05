@@ -313,4 +313,27 @@ mod test {
             )
         );
     }
+
+    // These are tests that we took from inventory files in the wild that we put here so we don't
+    // havd to keep entire inventory files around for testing
+    // as such we just want them to parse, and don't actually check the output
+    #[test]
+    fn parsing_external_py() -> Result<(), SphinxParseError> {
+        let examples = vec![
+            "or_ar.vecm.select_order.data py:parameter 2 generated/statsmodels.tsa.vector_ar.vecm.select_order.html#$ -",
+            "pySPACE.resources.dataset_defs.stream.StreamDataset.project2d py:staticmethod 1 api/generated/pySPACE.resources.dataset_defs.stream.html#$ -",
+            "pandas.api.typing.aliases.JoinHow py:type 1 reference/aliases.html#$ -",
+            "optking.v1.optparams.OptParams.fix_val_near_pi py:pydantic_field 1 optking.html#$ -",
+            "psi4.driver.driver_nbody.ManyBodyComputer py:pydantic_model 1 nbody.html#$ -",
+            "psi4.driver.driver_nbody.ManyBodyComputer.set_molecule py:pydantic_validator 1 nbody.html#$ -",
+            "pySPACE.missions.support.windower.Windower._load_window_spec py:classmethod 1 api/generated/pySPACE.missions.support.windower.html#$ -",
+            "pyvista.plotting.opts.RepresentationType py:enum 1 api/plotting/_autosummary/pyvista.plotting.opts.RepresentationType.html#$ -",
+            "gevent._interfaces.IWatcher py:interface 1 api/gevent.hub.html#$ -",
+        ];
+
+        for ex in examples {
+            let _ = parse_reference(ex, 0)?;
+        }
+        Ok(())
+    }
 }
