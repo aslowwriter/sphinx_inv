@@ -335,6 +335,7 @@ mod test {
             "js:function",
             "js:method",
             "js:class",
+            "js:attribute",
         ];
         for role in roles {
             let _ = role_domain
