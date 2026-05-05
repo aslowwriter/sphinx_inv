@@ -14,10 +14,17 @@ use crate::roles::SphinxType;
 /// if you would like one added please open a feature request
 #[derive(Debug, PartialEq)]
 pub enum CppRole {
+    Enum,
+    Enumerator,
+
     /// Describes a C++ class
     /// Sphinx considers this to be equivalent to `cpp:struct`
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/cpp.html#directive-cpp-class)
     Class,
+
+    Union,
+
+    Concept,
 
     /// Describes a C++ function, which may also be a method on a class
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/cpp.html#directive-cpp-function)
@@ -43,12 +50,16 @@ pub enum CppRole {
 impl Display for CppRole {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
+            CppRole::Enumerator => "enumerator",
+            CppRole::Enum => "enum",
             CppRole::Class => "class",
             CppRole::Function => "function",
             CppRole::FunctionParam => "functionParam",
             CppRole::Member => "member",
             CppRole::TemplateParam => "templateParam",
             CppRole::Type => "type",
+            CppRole::Union => "union",
+            CppRole::Concept => "concept",
         })
     }
 }
@@ -59,10 +70,14 @@ impl FromStr for CppRole {
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
             "class" => Ok(CppRole::Class),
+            "enumerator" => Ok(CppRole::Enumerator),
+            "enum" => Ok(CppRole::Enum),
             "function" => Ok(CppRole::Function),
             "functionParam" => Ok(CppRole::FunctionParam),
             "member" => Ok(CppRole::Member),
             "templateParam" => Ok(CppRole::TemplateParam),
+            "concept" => Ok(CppRole::Concept),
+            "union" => Ok(CppRole::Union),
             "type" => Ok(CppRole::Type),
 
             // this is only really necessary to communicate with the parser

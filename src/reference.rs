@@ -321,12 +321,16 @@ mod test {
     fn parsing_external_py() -> Result<(), SphinxParseError> {
         let examples = vec![
             "or_ar.vecm.select_order.data py:parameter 2 generated/statsmodels.tsa.vector_ar.vecm.select_order.html#$ -",
+            "right_x cpp:enumerator 1 cpp/reference/panda3d.core.InputDevice#_CPPv4N4Axis7right_xE -",
+            "TextureStage::Mode cpp:enum 1 cpp/reference/panda3d.core.TextureStage#_CPPv4N12TextureStage4ModeE -",
             "pySPACE.resources.dataset_defs.stream.StreamDataset.project2d py:staticmethod 1 api/generated/pySPACE.resources.dataset_defs.stream.html#$ -",
             "pandas.api.typing.aliases.JoinHow py:type 1 reference/aliases.html#$ -",
             "optking.v1.optparams.OptParams.fix_val_near_pi py:pydantic_field 1 optking.html#$ -",
             "psi4.driver.driver_nbody.ManyBodyComputer py:pydantic_model 1 nbody.html#$ -",
             "psi4.driver.driver_nbody.ManyBodyComputer.set_molecule py:pydantic_validator 1 nbody.html#$ -",
             "pySPACE.missions.support.windower.Windower._load_window_spec py:classmethod 1 api/generated/pySPACE.missions.support.windower.html#$ -",
+            "Data::@data cpp:union 1 usage/domains/cpp.html#_CPPv4N4DataUt4_dataE Data::[anonymous]",
+            "td::Iterator cpp:concept 1 usage/domains/cpp.html#_CPPv4I0ENSt8IteratorE -",
             "pyvista.plotting.opts.RepresentationType py:enum 1 api/plotting/_autosummary/pyvista.plotting.opts.RepresentationType.html#$ -",
             "gevent._interfaces.IWatcher py:interface 1 api/gevent.hub.html#$ -",
         ];

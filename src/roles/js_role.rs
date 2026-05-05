@@ -32,6 +32,8 @@ pub enum JsRole {
     /// Describes a global variable or constant.
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/javascript.html#directive-js-data)
     Data,
+
+    Attribute,
 }
 impl Display for JsRole {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -41,6 +43,7 @@ impl Display for JsRole {
             JsRole::Method => "method",
             JsRole::Class => "class",
             JsRole::Data => "data",
+            JsRole::Attribute => "attribute",
         })
     }
 }
@@ -54,6 +57,7 @@ impl FromStr for JsRole {
             "function" => Ok(JsRole::Function),
             "method" => Ok(JsRole::Method),
             "class" => Ok(JsRole::Class),
+            "attribute" => Ok(JsRole::Attribute),
 
             _ => Err(ContextError::new()),
         }
