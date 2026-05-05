@@ -23,7 +23,7 @@ pub use rst_role::RstRole;
 pub use std_role::StdRole;
 use winnow::{
     ModalResult, Parser,
-    combinator::{cut_err, dispatch, fail, terminated, trace},
+    combinator::{cut_err, dispatch, eof, fail, not, terminated, trace},
     error::{StrContext, StrContextValue},
 };
 
@@ -61,6 +61,18 @@ fn domain<'s>(input: &mut &'s str) -> ModalResult<&'s str> {
 }
 
 pub(crate) fn role_domain(input: &mut &str) -> ModalResult<SphinxType> {
+    cut_err(
+        not(eof)
+            .context(StrContext::Label("missing domain:role"))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("std")))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("py")))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("c")))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("rst")))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("cpp")))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("js")))
+            .context(StrContext::Expected(StrContextValue::StringLiteral("math"))),
+    )
+    .parse_next(input)?;
     dispatch! {terminated(domain,':');
         "std" => cut_err(std_role),
         "py" => cut_err(py_role),
@@ -69,7 +81,7 @@ pub(crate) fn role_domain(input: &mut &str) -> ModalResult<SphinxType> {
         "cpp" => cut_err(cpp_role),
         "js" => cut_err(js_role),
         "math" => cut_err(math_role),
-        _ => fail.context(StrContext::Label("unknown domain")).context(StrContext::Expected(StrContextValue::StringLiteral("std"))) .context(StrContext::Expected(StrContextValue::StringLiteral("py"))).context(StrContext::Expected(StrContextValue::StringLiteral("c"))).context(StrContext::Expected(StrContextValue::StringLiteral("rst"))).context(StrContext::Expected(StrContextValue::StringLiteral("cpp"))).context(StrContext::Expected(StrContextValue::StringLiteral("js"))).context(StrContext::Expected(StrContextValue::StringLiteral("math")))
+        _ => fail
     }
     .parse_next(input)
 }
