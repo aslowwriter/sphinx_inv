@@ -5,6 +5,7 @@ mod js_role;
 mod math_role;
 mod py_role;
 mod rst_role;
+mod sip_role;
 mod std_role;
 
 pub(crate) use c_role::c_role;
@@ -14,6 +15,7 @@ pub(crate) use js_role::js_role;
 pub(crate) use math_role::math_role;
 pub(crate) use py_role::py_role;
 pub(crate) use rst_role::rst_role;
+pub(crate) use sip_role::sip_role;
 pub(crate) use std_role::std_role;
 
 pub use c_role::CRole;
@@ -23,6 +25,7 @@ pub use js_role::JsRole;
 pub use math_role::MathRole;
 pub use py_role::PyRole;
 pub use rst_role::RstRole;
+pub use sip_role::SipRole;
 pub use std_role::StdRole;
 
 use std::fmt::Display;
@@ -36,6 +39,7 @@ pub enum SphinxType {
     JavaScript(JsRole),
     Mathematics(MathRole),
     ReStructuredText(RstRole),
+    Sip(SipRole),
     Cmake(CmakeRole),
 }
 
@@ -49,6 +53,7 @@ impl Display for SphinxType {
             SphinxType::JavaScript(js_role) => format!("js:{js_role}"),
             SphinxType::Mathematics(math_role) => format!("math:{math_role}"),
             SphinxType::ReStructuredText(rst_role) => format!("rst:{rst_role}"),
+            SphinxType::Sip(sip_role) => format!("sip:{sip_role}"),
             SphinxType::Cmake(cmake_role) => format!("cmake:{cmake_role}"),
         })
     }

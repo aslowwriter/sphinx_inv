@@ -82,6 +82,7 @@ fn role_domain(input: &mut &str) -> ModalResult<SphinxType> {
         "cpp" => cut_err(cpp_role),
         "js" => cut_err(js_role),
         "math" => cut_err(math_role),
+        "sip" => cut_err(sip_role),
         _ => cut_err(fail).context(StrContext::Label("unknown domain")).context(StrContext::Expected(StrContextValue::StringLiteral("std"))) .context(StrContext::Expected(StrContextValue::StringLiteral("py"))).context(StrContext::Expected(StrContextValue::StringLiteral("c"))).context(StrContext::Expected(StrContextValue::StringLiteral("rst"))).context(StrContext::Expected(StrContextValue::StringLiteral("cpp"))).context(StrContext::Expected(StrContextValue::StringLiteral("js"))).context(StrContext::Expected(StrContextValue::StringLiteral("math")))
         "cmake" => cut_err(cmake_role),
     }
@@ -317,6 +318,12 @@ mod test {
             "right_x cpp:enumerator 1 cpp/reference/panda3d.core.InputDevice#_CPPv4N4Axis7right_xE -",
             "TextureStage::Mode cpp:enum 1 cpp/reference/panda3d.core.TextureStage#_CPPv4N12TextureStage4ModeE -",
             "pySPACE.resources.dataset_defs.stream.StreamDataset.project2d py:staticmethod 1 api/generated/pySPACE.resources.dataset_defs.stream.html#$ -",
+            "PyQt5.QtXmlPatterns.QXmlNodeModelIndex.NodeKind.Attribute sip:member 0 api/qtxmlpatterns/qxmlnodemodelindex.html##NodeKind-Attribute Attribute",
+            "PyQt5.QtXmlPatterns.QXmlResultItems sip:class 0 api/qtxmlpatterns/qxmlresultitems.html QXmlResultItems",
+            "PyQt5.QtXml sip:module 0 api/qtxml/qtxml-module.html QtXml",
+            "PyQt5.QtWinExtras.QtWin.WindowFlip3DPolicy sip:enum 0 api/qtwinextras/qtwin.html##WindowFlip3DPolicy WindowFlip3DPolicy",
+            "PyQt5.QtWidgets.QTextEdit.undoAvailable sip:signal 0 api/qtwidgets/qtextedit.html##undoAvailable undoAvailable",
+            "PyQt5.QtWidgets.QStyleOptionTabWidgetFrame.tabBarRect sip:attribute 0 api/qtwidgets/qstyleoptiontabwidgetframe.html##tabBarRect tabBarRect",
             "pandas.api.typing.aliases.JoinHow py:type 1 reference/aliases.html#$ -",
             "optking.v1.optparams.OptParams.fix_val_near_pi py:pydantic_field 1 optking.html#$ -",
             "psi4.driver.driver_nbody.ManyBodyComputer py:pydantic_model 1 nbody.html#$ -",
