@@ -1,6 +1,7 @@
 mod c_role;
 mod cmake_role;
 mod cpp_role;
+mod http_role;
 mod js_role;
 mod math_role;
 mod py_role;
@@ -11,6 +12,7 @@ mod std_role;
 pub(crate) use c_role::c_role;
 pub(crate) use cmake_role::cmake_role;
 pub(crate) use cpp_role::cpp_role;
+pub(crate) use http_role::http_role;
 pub(crate) use js_role::js_role;
 pub(crate) use math_role::math_role;
 pub(crate) use py_role::py_role;
@@ -34,7 +36,10 @@ use winnow::{
 
 use std::fmt::Display;
 
-use crate::{reference::word, roles::sip_role::SipRole};
+use crate::{
+    reference::word,
+    roles::{http_role::HttpRole, sip_role::SipRole},
+};
 
 #[derive(Debug, PartialEq)]
 pub enum SphinxType {
@@ -47,6 +52,7 @@ pub enum SphinxType {
     ReStructuredText(RstRole),
     Cmake(CmakeRole),
     Sip(SipRole),
+    Http(HttpRole),
 }
 
 impl Display for SphinxType {
@@ -61,6 +67,7 @@ impl Display for SphinxType {
             SphinxType::ReStructuredText(rst_role) => format!("rst:{rst_role}"),
             SphinxType::Cmake(cmake_role) => format!("cmake:{cmake_role}"),
             SphinxType::Sip(sip_role) => format!("sip:{sip_role}"),
+            SphinxType::Http(http_role) => format!("http:{http_role}"),
         })
     }
 }
@@ -92,6 +99,7 @@ pub(crate) fn role_domain(input: &mut &str) -> ModalResult<SphinxType> {
         "math" => cut_err(math_role),
         "cmake" => cut_err(cmake_role),
         "sip" => cut_err(sip_role),
+        "http" => cut_err(http_role),
         _ => fail
     }
     .parse_next(input)
@@ -388,6 +396,27 @@ mod test {
             "sip:module",
             "sip:attribute",
             "sip:enum",
+        ];
+
+        for role in roles {
+            let _ = role_domain
+                .parse(role)
+                .map_err(|e| SphinxParseError::from_str_parse(&e, 0))?;
+        }
+
+        Ok(())
+    }
+    #[test]
+    fn parse_http_domain() -> Result<(), SphinxParseError> {
+        let roles = vec![
+            "http:any",
+            "http:copy",
+            "http:delete",
+            "http:get",
+            "http:head",
+            "http:post",
+            "http:put",
+            "http:put",
         ];
 
         for role in roles {
