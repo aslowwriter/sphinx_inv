@@ -282,16 +282,24 @@ mod test {
     #[test]
     fn parse_python_roles() -> Result<(), SphinxParseError> {
         let roles = vec![
-            "py:parameter",
+            "py:attr",
             "py:attribute",
+            "py:class",
+            "py:classmethod",
             "py:data",
+            "py:enum",
             "py:exception",
-            "py:type",
             "py:function",
+            "py:interface",
             "py:method",
             "py:module",
+            "py:parameter",
             "py:property",
-            "py:class",
+            "py:pydantic_field",
+            "py:pydantic_model",
+            "py:pydantic_validator",
+            "py:staticmethod",
+            "py:type",
         ];
         for role in roles {
             let _ = role_domain
