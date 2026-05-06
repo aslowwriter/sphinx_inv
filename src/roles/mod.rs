@@ -23,10 +23,12 @@ pub(crate) use std_role::std_role;
 pub use c_role::CRole;
 pub use cmake_role::CmakeRole;
 pub use cpp_role::CppRole;
+pub use http_role::HttpRole;
 pub use js_role::JsRole;
 pub use math_role::MathRole;
 pub use py_role::PyRole;
 pub use rst_role::RstRole;
+pub use sip_role::SipRole;
 pub use std_role::StdRole;
 use winnow::{
     ModalResult, Parser,
@@ -36,10 +38,7 @@ use winnow::{
 
 use std::fmt::Display;
 
-use crate::{
-    reference::word,
-    roles::{http_role::HttpRole, sip_role::SipRole},
-};
+use crate::reference::word;
 
 #[derive(Debug, PartialEq)]
 pub enum SphinxType {

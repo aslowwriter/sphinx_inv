@@ -145,14 +145,6 @@
 //! str.join py:method 1 library/stdtypes.html#$ -
 //! ```
 //!
-//! ## Special Thanks
-//!
-//! - Thank you to Brian Skinn et al. for all the research they did into the format
-//!   which they documented in the
-//!   [sphobjinv package](https://sphobjinv.readthedocs.io/en/stable/syntax.html)
-//!   They have been invaluable in writing this library.
-//! - Thank you to `BurntSushi` for writing the `csv` crate which has been a great example
-//!   to follow when designing the API
 
 mod error;
 mod header;
@@ -194,4 +186,4 @@ pub use writers::PlainTextSphinxInventoryWriter;
 /// between object types and names between different languages
 pub use roles::SphinxType;
 
-pub use roles::{CRole, CppRole, JsRole, MathRole, PyRole, RstRole, StdRole};
+pub use roles::{CRole, CmakeRole, CppRole, JsRole, MathRole, PyRole, RstRole, SipRole, StdRole};

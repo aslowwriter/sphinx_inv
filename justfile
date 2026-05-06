@@ -44,21 +44,13 @@ clean:
 check:
     cargo check
 
-newest:
-    cargo upgrade --incompatible --recursive
-    cargo +nightly update --breaking -Z unstable-options
-
-semver:
-    cargo semver-checks
-
-install-dev-tools:
-    cargo install cargo-binstall
-    cargo binstall cargo-semver -y
-    cargo binstall cargo-edit -y
-    cargo binstall git-cliff -y
-    cargo binstall typos-cli -y
-    cargo binstall taplo-cli -y
-    cargo binstall bacon -y
+# bit hacky but this should at least work across shells
+# checks if there is a pr open from the current branch and if not opens one for you
+# will only happen if lint and test pass and there are not uncommitted changes to tracked files
+pr: ci
+    gh pr list --head "$(git rev-parse --abbrev-ref HEAD)" --json author --jq ". == []" | grep -q "true"
+    git diff-index --quiet HEAD --
+    gh pr create --web --fill-first
 
 # Run all quality checks: fmt, lint, check, test
 ci:
