@@ -5,8 +5,8 @@ use crate::{
 };
 use winnow::{
     ModalResult, Parser,
-    ascii::{space1, till_line_ending},
-    combinator::{alt, preceded, repeat_till, trace},
+    ascii::till_line_ending,
+    combinator::{alt, opt, preceded, repeat_till, trace},
     stream::AsChar,
     token::take_while,
 };
@@ -138,17 +138,17 @@ fn non_word<'s>(input: &mut &'s str) -> ModalResult<&'s str> {
 }
 
 fn priority(input: &mut &str) -> ModalResult<SphinxPriority> {
-    preceded(space1, alt(("-1", "1", "0", "2")))
+    preceded(" ", alt(("-1", "1", "0", "2")))
         .parse_to()
         .parse_next(input)
 }
 
-fn uri<'s>(input: &mut &'s str) -> ModalResult<&'s str> {
-    trace("uri", preceded(space1, non_space)).parse_next(input)
+fn uri<'s>(input: &mut &'s str) -> ModalResult<Option<&'s str>> {
+    trace("uri", preceded(" ", opt(non_space))).parse_next(input)
 }
 
 fn display_name<'s>(input: &mut &'s str) -> ModalResult<&'s str> {
-    trace("display_name", preceded(space1, till_line_ending)).parse_next(input)
+    trace("display_name", preceded(" ", till_line_ending)).parse_next(input)
 }
 
 fn name_domain_role(input: &mut &str) -> ModalResult<(String, SphinxType)> {
@@ -169,23 +169,18 @@ fn name_domain_role(input: &mut &str) -> ModalResult<(String, SphinxType)> {
 }
 
 pub fn parse_reference(line: &str, line_num: usize) -> Result<SphinxReference, SphinxParseError> {
-    let ((name, sphinx_type), prio, loc, dispname) = reference
-        .parse(line)
-        .map_err(|error| SphinxParseError::from_str_parse(&error, line_num))?;
+    let ((name, sphinx_type), prio, loc, dispname) =
+        (name_domain_role, priority, uri, display_name)
+            .parse(line)
+            .map_err(|error| SphinxParseError::from_str_parse(&error, line_num))?;
 
     Ok(SphinxReference::new(
         &name,
         sphinx_type,
         prio,
-        loc,
+        loc.unwrap_or_default(),
         dispname,
     ))
-}
-
-fn reference<'a>(
-    input: &mut &'a str,
-) -> ModalResult<((String, SphinxType), SphinxPriority, &'a str, &'a str)> {
-    (name_domain_role, priority, uri, display_name).parse_next(input)
 }
 
 #[cfg(test)]
@@ -224,6 +219,26 @@ mod test {
         assert_eq!(
             sphinx_ref.display_name,
             ReferenceString::Expanded("asdf".to_string())
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_index_line() -> Result<(), SphinxParseError> {
+        let input = "index std:doc -1  Furo".to_string();
+
+        let sphinx_ref = parse_reference(&input, 0)?;
+        assert_eq!(sphinx_ref.name, "index".to_string());
+        assert_eq!(sphinx_ref.sphinx_type, SphinxType::Std(StdRole::Doc));
+        assert_eq!(sphinx_ref.priority, SphinxPriority::Omit);
+        assert_eq!(
+            sphinx_ref.location,
+            ReferenceString::Expanded(String::new())
+        );
+        assert_eq!(
+            sphinx_ref.display_name,
+            ReferenceString::Expanded("Furo".to_string())
         );
 
         Ok(())
@@ -283,9 +298,9 @@ mod test {
 
     #[test]
     fn test_parse_example_record_with_newline() {
-        let mut input = "str.join\n py:method 1 library/stdtypes.html#$ -";
+        let input = "str.join\n py:method 1 library/stdtypes.html#$ -";
 
-        let result = reference(&mut input);
+        let result = parse_reference(input, 0);
         assert!(result.is_err());
     }
     #[test]
