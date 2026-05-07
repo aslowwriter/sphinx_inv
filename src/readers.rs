@@ -187,8 +187,9 @@ mod test {
     use pretty_assertions::assert_eq;
 
     use crate::{
-        InventoryHeader, SphinxReference,
+        InventoryHeader, SphinxReference, SphinxType,
         error::{SphinxInvError, SphinxParseError},
+        priority::SphinxPriority,
         readers::PlainTextSphinxInventoryReader,
         roles::PyRole,
     };
@@ -220,16 +221,15 @@ str.lower py:method 1 library/stdtypes.html#$ -
         assert!(inv_reader.next().unwrap().is_err());
         assert!(inv_reader.next().unwrap().is_err());
 
-        assert_eq!(
-            inv_reader.next().unwrap().unwrap(),
-            SphinxReference {
-                name: "str.lower".to_string(),
-                sphinx_type: crate::roles::SphinxType::Python(PyRole::Method),
-                priority: crate::priority::SphinxPriority::Standard,
-                location: "library/stdtypes.html#$".to_string(),
-                display_name: "-".to_string()
-            }
+        let str_lower_ref = SphinxReference::new(
+            "str.lower",
+            SphinxType::Python(PyRole::Method),
+            SphinxPriority::Standard,
+            "library/stdtypes.html#str.lower",
+            "str.lower",
         );
+
+        assert_eq!(inv_reader.next().unwrap().unwrap(), str_lower_ref);
 
         assert!(inv_reader.next().is_none());
 
@@ -274,27 +274,24 @@ str.lower py:method 1 library/stdtypes.html#$ -
             }
         );
 
-        assert_eq!(
-            inv_reader.next().unwrap().unwrap(),
-            SphinxReference {
-                name: "str.join".to_string(),
-                sphinx_type: crate::roles::SphinxType::Python(PyRole::Method),
-                priority: crate::priority::SphinxPriority::Standard,
-                location: "library/stdtypes.html#$".to_string(),
-                display_name: "-".to_string()
-            }
+        let str_lower_ref = SphinxReference::new(
+            "str.lower",
+            SphinxType::Python(PyRole::Method),
+            SphinxPriority::Standard,
+            "library/stdtypes.html#str.lower",
+            "str.lower",
         );
 
-        assert_eq!(
-            inv_reader.next().unwrap().unwrap(),
-            SphinxReference {
-                name: "str.lower".to_string(),
-                sphinx_type: crate::roles::SphinxType::Python(PyRole::Method),
-                priority: crate::priority::SphinxPriority::Standard,
-                location: "library/stdtypes.html#$".to_string(),
-                display_name: "-".to_string()
-            }
+        let str_join_ref = SphinxReference::new(
+            "str.join",
+            SphinxType::Python(PyRole::Method),
+            SphinxPriority::Standard,
+            "library/stdtypes.html#str.join",
+            "-",
         );
+        assert_eq!(inv_reader.next().unwrap().unwrap(), str_join_ref);
+
+        assert_eq!(inv_reader.next().unwrap().unwrap(), str_lower_ref);
 
         assert!(inv_reader.next().is_none());
 
@@ -326,17 +323,30 @@ str.lower asdf:method 1 library/stdtypes.html#$ -
                 compression_method_description: "zlib".to_string()
             }
         );
-
-        assert_eq!(
-            inv_reader.next().unwrap().unwrap(),
-            SphinxReference {
-                name: "str.join".to_string(),
-                sphinx_type: crate::roles::SphinxType::Python(PyRole::Method),
-                priority: crate::priority::SphinxPriority::Standard,
-                location: "library/stdtypes.html#$".to_string(),
-                display_name: "-".to_string()
-            }
+        let str_upper_ref = SphinxReference::new(
+            "str.upper",
+            SphinxType::Python(PyRole::Method),
+            SphinxPriority::Standard,
+            "library/stdtypes.html#str.upper",
+            "str.upper",
         );
+        let str_lower_ref = SphinxReference::new(
+            "str.lower",
+            SphinxType::Python(PyRole::Method),
+            SphinxPriority::Standard,
+            "library/stdtypes.html#str.lower",
+            "str.lower",
+        );
+
+        let str_join_ref = SphinxReference::new(
+            "str.join",
+            SphinxType::Python(PyRole::Method),
+            SphinxPriority::Standard,
+            "library/stdtypes.html#str.join",
+            "-",
+        );
+
+        assert_eq!(inv_reader.next().unwrap().unwrap(), str_join_ref);
 
         assert_eq!(
             inv_reader.next(),
@@ -349,16 +359,7 @@ str.lower asdf:method 1 library/stdtypes.html#$ -
             .into()))
         );
 
-        assert_eq!(
-            inv_reader.next().unwrap().unwrap(),
-            SphinxReference {
-                name: "str.upper".to_string(),
-                sphinx_type: crate::roles::SphinxType::Python(PyRole::Method),
-                priority: crate::priority::SphinxPriority::Standard,
-                location: "library/stdtypes.html#$".to_string(),
-                display_name: "-".to_string()
-            }
-        );
+        assert_eq!(inv_reader.next().unwrap().unwrap(), str_upper_ref);
 
         assert_eq!(
             inv_reader.next(),
@@ -371,16 +372,7 @@ str.lower asdf:method 1 library/stdtypes.html#$ -
             .into()))
         );
 
-        assert_eq!(
-            inv_reader.next().unwrap().unwrap(),
-            SphinxReference {
-                name: "str.lower".to_string(),
-                sphinx_type: crate::roles::SphinxType::Python(PyRole::Method),
-                priority: crate::priority::SphinxPriority::Standard,
-                location: "library/stdtypes.html#$".to_string(),
-                display_name: "-".to_string()
-            }
-        );
+        assert_eq!(inv_reader.next().unwrap().unwrap(), str_lower_ref);
 
         assert_eq!(
             inv_reader.next(),
