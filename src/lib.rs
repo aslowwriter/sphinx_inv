@@ -45,23 +45,23 @@
 //! #
 //! let header = InventoryHeader::new("Sphinx Inv", "0.2.0");
 //! let join_reference = SphinxReference::new(
-//!     "str.join".to_string(),
+//!     "str.join",
 //!     SphinxType::Python(PyRole::Method),
-//!     None,
-//!     "library/stdtypes.html#$".to_string(),
-//!     None);
+//!     SphinxPriority::Standard,
+//!     "library/stdtypes.html#$",
+//!     "-");
 //! let lower_reference = SphinxReference::new(
-//!     "str.lower".to_string(),
+//!     "str.lower",
 //!     SphinxType::Python(PyRole::Method),
-//!     None,
-//!     "library/stdtypes.html#$".to_string(),
-//!     None);
+//!     SphinxPriority::Standard,
+//!     "library/stdtypes.html#$",
+//!     "-");
 //!
 //! let mut buffer = Vec::new();
 //!
 //! let mut cursor = Cursor::new(buffer);
 //! // the capacity is just to preallocate the internal buffer, it can be anything
-//! let mut writer = PlainTextSphinxInventoryWriter::from_header(&header, 2);
+//! let mut writer = PlainTextSphinxInventoryWriter::from_header(&header, 2, true);
 //!
 //!
 //! // add the references to the writer
@@ -185,5 +185,7 @@ pub use writers::PlainTextSphinxInventoryWriter;
 /// type used to parse `{domain}:{roles}` information provided by Sphinx used to disembguate
 /// between object types and names between different languages
 pub use roles::SphinxType;
+
+pub use priority::SphinxPriority;
 
 pub use roles::{CRole, CmakeRole, CppRole, JsRole, MathRole, PyRole, RstRole, SipRole, StdRole};

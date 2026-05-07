@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use crate::{
     error::SphinxParseError,
     priority::SphinxPriority,
@@ -13,40 +11,111 @@ use winnow::{
     token::take_while,
 };
 
+// basically just a wrapper so the type system can keep track of whether it's minified or not for us
 #[derive(Debug, PartialEq)]
+enum ReferenceString {
+    Minified(String),
+    Expanded(String),
+}
+
+#[derive(Debug)]
 pub struct SphinxReference {
     pub name: String,
     // type is a reserved keyword
     pub sphinx_type: SphinxType,
     pub priority: SphinxPriority,
-    pub location: String,
-    pub display_name: String,
+    location: ReferenceString,
+    display_name: ReferenceString,
+}
+
+impl PartialEq for SphinxReference {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.sphinx_type == other.sphinx_type
+            && self.priority == other.priority
+            && self.expanded_location() == other.expanded_location()
+            && self.expanded_display_name() == other.expanded_display_name()
+    }
 }
 
 impl SphinxReference {
     pub fn new(
-        name: String,
+        name: &str,
         sphinx_type: SphinxType,
-        priority: Option<SphinxPriority>,
-        location: String,
-        display_name: Option<String>,
+        priority: SphinxPriority,
+        location: &str,
+        display_name: &str,
     ) -> Self {
+        let loc = if location.ends_with("#$") {
+            ReferenceString::Minified(location.to_string())
+        } else {
+            ReferenceString::Expanded(location.to_string())
+        };
+
+        let disp_name = if display_name == "-" {
+            ReferenceString::Minified(display_name.to_string())
+        } else {
+            ReferenceString::Expanded(display_name.to_string())
+        };
         Self {
-            name,
+            name: name.to_string(),
             sphinx_type,
-            priority: priority.unwrap_or(SphinxPriority::Standard),
-            location,
-            display_name: display_name.unwrap_or("-".to_string()),
+            priority,
+            location: loc,
+            display_name: disp_name,
         }
     }
-}
 
-impl Display for SphinxReference {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!(
+    pub fn expanded_location(&self) -> String {
+        match &self.location {
+            ReferenceString::Expanded(s) => s.clone(),
+            ReferenceString::Minified(s) => s.replace('$', &self.name),
+        }
+    }
+
+    pub fn expanded_display_name(&self) -> String {
+        match &self.display_name {
+            ReferenceString::Expanded(s) => s.clone(),
+            ReferenceString::Minified(_) => self.name.clone(),
+        }
+    }
+    pub fn minified_location(&self) -> String {
+        match &self.location {
+            ReferenceString::Minified(s) => s.clone(),
+            ReferenceString::Expanded(s) => match s.split_once('#') {
+                Some((prefix, _suffix)) => format!("{prefix}#$"),
+                None => s.clone(),
+            },
+        }
+    }
+
+    pub fn minified_display_name(&self) -> String {
+        match &self.display_name {
+            ReferenceString::Minified(s) => s.clone(),
+            ReferenceString::Expanded(_s) => "-".to_string(),
+        }
+    }
+
+    pub fn fmt_expanded(&self) -> String {
+        format!(
             "{} {} {} {} {}",
-            self.name, self.sphinx_type, self.priority, self.location, self.display_name
-        ))
+            self.name,
+            self.sphinx_type,
+            self.priority,
+            self.expanded_location(),
+            self.expanded_display_name()
+        )
+    }
+
+    pub fn fmt_minified(&self) -> String {
+        format!(
+            "{} {} {} {} {}",
+            self.name,
+            self.sphinx_type,
+            self.priority,
+            self.minified_location(),
+            self.minified_display_name()
+        )
     }
 }
 
@@ -104,20 +173,13 @@ pub fn parse_reference(line: &str, line_num: usize) -> Result<SphinxReference, S
         .parse(line)
         .map_err(|error| SphinxParseError::from_str_parse(&error, line_num))?;
 
-    // let display_name = if dispname == "-" {
-    //     name.clone()
-    // } else {
-    //     dispname.to_string()
-    // };
-    // let location = loc.replace('$', &name);
-
-    Ok(SphinxReference {
-        name,
+    Ok(SphinxReference::new(
+        &name,
         sphinx_type,
-        priority: prio,
-        location: loc.to_string(),
-        display_name: dispname.to_string(),
-    })
+        prio,
+        loc,
+        dispname,
+    ))
 }
 
 fn reference<'a>(
@@ -155,8 +217,14 @@ mod test {
         );
         assert_eq!(sphinx_ref.sphinx_type, SphinxType::Std(StdRole::Label));
         assert_eq!(sphinx_ref.priority, SphinxPriority::Standard);
-        assert_eq!(sphinx_ref.location, "library/stdtypes.html");
-        assert_eq!(sphinx_ref.display_name, "asdf");
+        assert_eq!(
+            sphinx_ref.location,
+            ReferenceString::Expanded("library/stdtypes.html".to_string())
+        );
+        assert_eq!(
+            sphinx_ref.display_name,
+            ReferenceString::Expanded("asdf".to_string())
+        );
 
         Ok(())
     }
@@ -171,8 +239,14 @@ mod test {
             SphinxType::ReStructuredText(RstRole::Option)
         );
         assert_eq!(sphinx_ref.priority, SphinxPriority::Standard);
-        assert_eq!(sphinx_ref.location, "library/stdtypes.html#$");
-        assert_eq!(sphinx_ref.display_name, "-");
+        assert_eq!(
+            sphinx_ref.location,
+            ReferenceString::Minified("library/stdtypes.html#$".to_string())
+        );
+        assert_eq!(
+            sphinx_ref.display_name,
+            ReferenceString::Minified("-".to_string())
+        );
 
         Ok(())
     }
@@ -222,8 +296,14 @@ mod test {
         assert_eq!(sphinx_ref.name, "str.join".to_string());
         assert_eq!(sphinx_ref.sphinx_type, SphinxType::Python(PyRole::Method));
         assert_eq!(sphinx_ref.priority, SphinxPriority::Standard);
-        assert_eq!(sphinx_ref.location, "library/stdtypes.html#$");
-        assert_eq!(sphinx_ref.display_name, "-");
+        assert_eq!(
+            sphinx_ref.location,
+            ReferenceString::Minified("library/stdtypes.html#$".to_string())
+        );
+        assert_eq!(
+            sphinx_ref.display_name,
+            ReferenceString::Minified("-".to_string())
+        );
 
         Ok(())
     }
@@ -240,9 +320,14 @@ mod test {
         assert_eq!(sphinx_ref.priority, SphinxPriority::Omit);
         assert_eq!(
             sphinx_ref.location,
-            "accel/qaic/aic080.html#qualcomm-cloud-ai-80-aic080"
+            ReferenceString::Expanded(
+                "accel/qaic/aic080.html#qualcomm-cloud-ai-80-aic080".to_string()
+            )
         );
-        assert_eq!(sphinx_ref.display_name, "Qualcomm Cloud AI 80 (AIC080)");
+        assert_eq!(
+            sphinx_ref.display_name,
+            ReferenceString::Expanded("Qualcomm Cloud AI 80 (AIC080)".to_string())
+        );
 
         Ok(())
     }
@@ -260,9 +345,14 @@ mod test {
         assert_eq!(sphinx_ref.priority, SphinxPriority::Omit);
         assert_eq!(
             sphinx_ref.location,
-            "accel/qaic/aic080.html#qualcomm-cloud-ai-80-aic080"
+            ReferenceString::Expanded(
+                "accel/qaic/aic080.html#qualcomm-cloud-ai-80-aic080".to_string()
+            )
         );
-        assert_eq!(sphinx_ref.display_name, "Qualcomm Cloud AI 80 (AIC080)");
+        assert_eq!(
+            sphinx_ref.display_name,
+            ReferenceString::Expanded("Qualcomm Cloud AI 80 (AIC080)".to_string())
+        );
 
         Ok(())
     }
@@ -274,15 +364,15 @@ mod test {
                 name: "foo".to_string(),
                 sphinx_type: SphinxType::C(CRole::Macro),
                 priority: SphinxPriority::Standard,
-                location: "foo/bar".to_string(),
-                display_name: "-".to_string()
+                location: ReferenceString::Expanded("foo/bar".to_string()),
+                display_name: ReferenceString::Minified("-".to_string())
             },
             SphinxReference::new(
-                "foo".to_string(),
+                "foo",
                 SphinxType::C(CRole::Macro),
-                None,
-                "foo/bar".to_string(),
-                None
+                SphinxPriority::Standard,
+                "foo/bar",
+                "-"
             )
         );
     }
