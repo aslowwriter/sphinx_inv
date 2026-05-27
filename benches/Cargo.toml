@@ -1,0 +1,13 @@
+[package]
+name = "benches"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sphinx_inv = { version = "0.3.0", path = ".." }
+
+[[bin]]
+name = "parser"
+test = false
+bench = false
+path = "parser.rs"
