@@ -17,7 +17,6 @@ lint:
     typos -w .
     taplo fmt .
 
-
 # Run tests
 test:
     cargo test --all
@@ -57,3 +56,18 @@ ci:
     just lint
     just check
     just test
+
+download-lkd-objects:
+    curl -Lo objects.inv https://docs.kernel.org/objects.inv
+
+[working-directory('benches')]
+@compile-benches:
+    cargo build --release --bins
+
+run-benchmark: download-lkd-objects compile-benches
+    hyperfine -N "python benches/sphinx.py" -n "sphinx (python)" --reference benches/target/release/parser --reference-name "sphinx_inv (rust)"  --export-json timing.json --warmup 50 --min-runs 100 --time-unit millisecond
+
+render-comparison:
+    uv run benches/render.py timing.json comparison.webp
+
+benchmark: run-benchmark render-comparison
