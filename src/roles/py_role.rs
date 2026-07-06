@@ -14,11 +14,15 @@ use crate::roles::SphinxType;
 /// if you would like one added please open a feature request
 #[derive(Debug, PartialEq)]
 pub enum PyRole {
+    /// documents a parameter to a function or method.
+    /// [see more](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-function)
     Parameter,
 
     /// Describes an object data attribute
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-attribute)
     Attribute,
+
+    /// An allias for [`PyRole::Attribute`]
     Attr,
 
     /// References a module-level python variable.
