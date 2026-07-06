@@ -9,17 +9,28 @@ use winnow::{
 
 use crate::roles::SphinxType;
 
-/// Describes a sip role that has been observed in the wild, i.e. one of the known
-/// inventory file declared at least one line with the type `sip:{role}`
-/// if you would like one added please open a feature request
+/// SIP is a tool for automatically generating Python bindings for C and C++ libraries. [see more](https://python-sip.readthedocs.io/en/stable/introduction.html)
 #[derive(Debug, PartialEq)]
 pub enum SipRole {
+    /// an SIP method declaration. [see more](https://python-sip.readthedocs.io/en/stable/directives.html#methodcode)
     Method,
+
+    /// an SIP method declaration on an associated class. [see more](https://python-sip.readthedocs.io/en/stable/directives.html#methodcode)
     Member,
+
+    /// A SIP class definition. [see more](https://python-sip.readthedocs.io/en/stable/annotations.html#class-annotations)
     Class,
+
+    /// an SIP defined attribute [see more](https://python-sip.readthedocs.io/en/stable/other_topics.html#lazy-type-attributes)
     Attribute,
+
+    /// A SIP enum. [see more](https://python-sip.readthedocs.io/en/stable/annotations.html#ref-enum-annos)
     Enum,
+
+    /// A SIP module. [see more](https://python-sip.readthedocs.io/en/stable/directives.html#module)
     Module,
+
+    /// A QT signal used in a SIP module. [see more](https://doc.qt.io/qt-6/signalsandslots.html)
     Signal,
 }
 impl Display for SipRole {
