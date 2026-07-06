@@ -1,3 +1,14 @@
+//! This module is for defining and parsing all of the various
+//! domains and roles needed to parse sphinx inventory files.
+//! Make note that anyone can define a new domain or role in python
+//! which is necessary for us to include here to make sure the files
+//! parse.
+//!
+//! We have done our best to infer what roles that were encountered
+//! in the wild are referring to and link to relevant documentation
+//! where possible, but at times this is at best a guess.
+//! If you find any of them to be incorrect, please open an issue!
+
 mod c_role;
 mod cmake_role;
 mod cpp_role;
@@ -40,17 +51,43 @@ use std::fmt::Display;
 
 use crate::reference::word;
 
+/// a sphinx type consists of a domain, and a role
+/// written as `{domain}:{role}` (e.g. c:struct)
+/// this enum defines all the domains and roles that we know.
+/// in shpinx this is used to avoid name conflicts but for us
+/// it is not really used beyond parsing it.
 #[derive(Debug, PartialEq)]
 pub enum SphinxType {
+    /// the default role in sphinx
     Std(StdRole),
+
+    /// the domain for documenting c code
     C(CRole),
+
+    /// the domain for documenting python code
     Python(PyRole),
+
+    /// the domain for documenting C++ code
     Cpp(CppRole),
+
+    /// the domain for documenting Javascript code
     JavaScript(JsRole),
+
+    /// the domain for documenting mathematics such as figures and equations
     Mathematics(MathRole),
+
+    /// the domain for documenting restructured text directives
+    /// and options used in Sphinx
     ReStructuredText(RstRole),
+
+    /// the domain for documenting cmake code and configuration
     Cmake(CmakeRole),
+
+    /// the domain for documenting SIP modules for defining
+    /// python bindings for C/C++ code.
     Sip(SipRole),
+
+    /// the domain for documenting http endopoints and verbs
     Http(HttpRole),
 }
 
