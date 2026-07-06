@@ -11,22 +11,61 @@ use crate::SphinxType;
 
 #[derive(Debug, PartialEq)]
 pub enum CmakeRole {
+    /// A cmake command in a cmake file like `set()`
+    /// or `add_executable()` not to be confused with a command line
+    /// command like `cmake build` see [the cmake docs](https://cmake.org/cmake/help/latest/manual/cmake-commands.7.html#cmake-commands-7) for more info
     Command,
+
+    /// Cpack generators create packages out of artifacts such as installers
+    /// [see more](https://cmake.org/cmake/help/latest/module/CPack.html#module:CPack)
     CpackGen,
+
+    /// A environment variable that cmake can use, e.g. `CMAKE_CONFIG_DIR` [ see more]( https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html ) for more
     Envvar,
+
+    /// A cmake Generator is responsible for writing the input files for a native build system.
+    /// [see more](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html)
     Generator,
+
+    /// A cmake generator expression [see more](https://cmake.org/cmake/help/latest/guide/tutorial/Miscellaneous%20Features.html#exercise-2-generator-expressions)
     Genex,
+
+    /// refers to a gide page such as the tutorial in the documentation
     Guide,
+
+    /// Refers to a man page such as `cmake(1)`
     Manual,
+
+    /// A cmake module designed for reuse. [see more](https://cmake.org/cmake/help/latest/manual/cmake-modules.7.html#manual:cmake-modules(7))
     Module,
+
+    /// policies introduce behavior changes while preserving compatibility for existing
+    /// project releases. [see more](https://cmake.org/cmake/help/latest/manual/cmake-policies.7.html)
     Policy,
+
+    /// A cache property [see more](https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html#properties-on-cache-entries)
     PropCache,
+
+    /// A directory property [see more](https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html#properties-on-directories)
     PropDir,
+
+    /// A global cmake property [see more](https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html#properties-of-global-scope)
     PropGbl,
+
+    /// Properties on installed files [see more](https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html#properties-on-installed-files)
     PropInst,
+
+    /// Properties on source files [see more](https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html#properties-on-source-files)
     PropSf,
+
+    /// Properties on tests [see more](https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html#properties-on-tests)
     PropTest,
+
+    /// A target property [see more](https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html#properties-on-targets)
     PropTgt,
+
+    /// A cmake variable. can be set by cmake itself or by project code
+    /// [see more](https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html)
     Variable,
 }
 
