@@ -2,11 +2,20 @@ use std::{fmt::Display, str::FromStr};
 
 use winnow::error::ContextError;
 
+/// The search priority of the associated object used by Sphinx
+/// This is here mostly because it is a required part of the inventory format
+/// it is not used anywhere in [`sphinx_inv`]
 #[derive(Debug, PartialEq)]
 pub enum SphinxPriority {
+    /// Omit object from search results
     Omit,
+
+    /// Object has standard priority in search results
     Standard,
+    /// Object has high priority in search results
     High,
+
+    /// Object has low priority in search results
     Low,
 }
 
