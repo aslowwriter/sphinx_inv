@@ -24,7 +24,7 @@
 //! structs to handle with them.
 //!
 //! The [`SphinxInventoryReader`] and [`SphinxInventoryWriter`] can work with any struct that
-//! immplements [`std::io::Read`] and [`std::io::Write`] respectively. These are internally buffered
+//! implements [`std::io::Read`] and [`std::io::Write`] respectively. These are internally buffered
 //! so you do not have to wrap them yourself.
 //!
 //! When interacting with real `objects.inv` files in the wild you will most likely use the base

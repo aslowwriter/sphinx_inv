@@ -22,7 +22,7 @@ pub enum PyRole {
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-attribute)
     Attribute,
 
-    /// An allias for [`PyRole::Attribute`]
+    /// An alias for [`PyRole::Attribute`]
     Attr,
 
     /// References a module-level python variable.

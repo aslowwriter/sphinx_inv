@@ -12,3 +12,5 @@ target/
 *.inv
 
 **/timing.json
+
+benches/objs/

@@ -27,7 +27,7 @@ structs and the [`SphinxInventoryReader`](https://docs.rs/sphinx_inv/latest/sphi
 structs to handle with them.
 
 The [`SphinxInventoryReader`](https://docs.rs/sphinx_inv/latest/sphinx_inv/struct.SphinxInventoryReader.html) and [`SphinxInventoryWriter`](https://docs.rs/sphinx_inv/latest/sphinx_inv/struct.SphinxInventoryWriter.html) can work with any struct that
-immplements [`std::io::Read`](https://doc.rust-lang.org/stable/std/io/trait.Read.html) and [`std::io::Write`](https://doc.rust-lang.org/stable/std/io/trait.Write.html) respectively. These are internally buffered
+implements [`std::io::Read`](https://doc.rust-lang.org/stable/std/io/trait.Read.html) and [`std::io::Write`](https://doc.rust-lang.org/stable/std/io/trait.Write.html) respectively. These are internally buffered
 so you do not have to wrap them yourself.
 
 When interacting with real `objects.inv` files in the wild you will most likely use the base
