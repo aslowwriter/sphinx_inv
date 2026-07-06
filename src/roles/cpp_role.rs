@@ -26,8 +26,14 @@ pub enum CppRole {
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/cpp.html#directive-cpp-class)
     Class,
 
+    /// alias for `CppRole::Class`
+    Struct,
+
+    /// A c++ union, somewhat analogous to a rust enum
+    /// [see more](https://en.cppreference.com/cpp/language/union)
     Union,
 
+    /// experimental. [see more](https://www.sphinx-doc.org/en/master/usage/domains/cpp.html#directive-cpp-concept)
     Concept,
 
     /// Describes a C++ function, which may also be a method on a class
@@ -42,7 +48,10 @@ pub enum CppRole {
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/cpp.html#directive-cpp-member)
     Member,
 
-    /// Describes a C+! template parameter
+    /// Alias for [`CppRole::Member`]
+    Var,
+
+    /// Describes a C++ template parameter
     /// No documentation seems to be available for this yet
     TemplateParam,
 
@@ -56,10 +65,10 @@ impl Display for CppRole {
         f.write_str(match self {
             CppRole::Enumerator => "enumerator",
             CppRole::Enum => "enum",
-            CppRole::Class => "class",
+            CppRole::Class | CppRole::Struct => "class",
             CppRole::Function => "function",
             CppRole::FunctionParam => "functionParam",
-            CppRole::Member => "member",
+            CppRole::Member | CppRole::Var => "member",
             CppRole::TemplateParam => "templateParam",
             CppRole::Type => "type",
             CppRole::Union => "union",
@@ -100,4 +109,29 @@ pub(crate) fn cpp_role(input: &mut &str) -> ModalResult<SphinxType> {
         .parse_to()
         .parse_next(input)?;
     Ok(SphinxType::Cpp(role))
+}
+
+#[cfg(test)]
+mod test {
+
+    use super::*;
+    #[test]
+    fn test_sphinx_role_parsing_std_err() {
+        assert!(CppRole::from_str("asdf").is_err());
+        assert!(CppRole::from_str("doc").is_err());
+        assert!(CppRole::from_str("").is_err());
+        assert!(CppRole::from_str("::::").is_err());
+        assert!(CppRole::from_str(" label").is_err());
+        assert!(CppRole::from_str(" asdf").is_err());
+        assert!(CppRole::from_str("function Param").is_err());
+    }
+    #[test]
+    fn test_sphinx_type_parsing_cpp() -> Result<(), ContextError> {
+        assert_eq!(CppRole::from_str("class")?, CppRole::Class);
+        assert_eq!(CppRole::from_str("function")?, CppRole::Function);
+        assert_eq!(CppRole::from_str("functionParam")?, CppRole::FunctionParam);
+        assert_eq!(CppRole::from_str("templateParam")?, CppRole::TemplateParam);
+        assert_eq!(CppRole::from_str("member")?, CppRole::Member);
+        Ok(())
+    }
 }
