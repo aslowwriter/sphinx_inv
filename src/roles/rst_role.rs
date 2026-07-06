@@ -22,6 +22,7 @@ pub enum RstRole {
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/restructuredtext.html#directive-rst-directive-option)
     Option,
 
+    /// a role of a particular domain [see more](https://www.sphinx-doc.org/en/master/glossary.html#term-role)
     Role,
 }
 
