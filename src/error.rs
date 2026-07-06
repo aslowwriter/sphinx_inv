@@ -60,11 +60,24 @@ pub enum MissingHeaderComponent {
     CompressionDescription,
 }
 
+/// An error type to show parsing errors when reading an inventory file
+/// this clones the underlying data so that it is not tied to the lifetime
+/// of the buffer. This can be used to format errors by users for example by using
+/// [`annotate-snippets`]
 #[derive(Error, Debug, PartialEq)]
 pub struct SphinxParseError {
+    /// The original line that failed to parse, so we can display it along with
+    /// the error message
     pub input: String,
+
+    /// A human readable description of the error to present to the user
     pub message: String,
+
+    /// The byte offset into [`SphinxParseError::input`] where the parse error occurred
     pub location: usize,
+
+    /// The line of the file where the error originally occurred. Should only be used for
+    /// displaying this to the user, and can be set arbitrarily
     pub line_num: usize,
 }
 
@@ -92,7 +105,10 @@ impl Display for SphinxParseError {
 }
 
 impl SphinxParseError {
-    pub fn from_byte_parse(error: &ParseError<&[u8], ContextError>, line_num: usize) -> Self {
+    pub(crate) fn from_byte_parse(
+        error: &ParseError<&[u8], ContextError>,
+        line_num: usize,
+    ) -> Self {
         // The default renderer for `ContextError` is still used but that can be
         // customized as well to better fit our needs.
         let message = error.inner().to_string();
@@ -111,8 +127,8 @@ impl SphinxParseError {
             line_num,
         }
     }
-    // Avoiding `From` so `winnow` types don't become part of our public API
-    pub fn from_str_parse(error: &ParseError<&str, ContextError>, line_num: usize) -> Self {
+
+    pub(crate) fn from_str_parse(error: &ParseError<&str, ContextError>, line_num: usize) -> Self {
         // The default renderer for `ContextError` is still used for now but that can be
         // customized as well to better fit our needs.
         let message = error.inner().to_string();
