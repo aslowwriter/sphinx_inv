@@ -17,6 +17,9 @@ lint:
     typos -w .
     taplo fmt .
 
+doc-cov:
+    RUSTDOCFLAGS='-Z unstable-options '--show-coverage cargo +nightly doc -Zunstable-options --no-deps
+
 # Run tests
 test:
     cargo test --all
