@@ -150,7 +150,6 @@ fn parse_compression_method(buffer: &mut &[u8]) -> WinnowResult<String> {
 /// This function only returns errors on parse errors. This function will not return
 /// errors on things such as unknown or unsupported sphinx versions. The caller is
 /// responsible for checking those
-///
 pub fn parse_header<R: BufRead>(reader: &mut R) -> Result<InventoryHeader, SphinxInvError> {
     let mut lines_iter = reader.lines();
 

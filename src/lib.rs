@@ -38,10 +38,10 @@
 //!
 //!
 //! ```
+//! # use pretty_assertions::assert_eq;
 //! # use sphinx_inv::*;
 //! # use std::fs::File;
-//! # use std::io::{Read, Write, Cursor};
-//! # use pretty_assertions::assert_eq;
+//! # use std::io::{Cursor, Read, Write};
 //! #
 //! let header = InventoryHeader::new("Sphinx Inv", "0.2.0");
 //! let join_reference = SphinxReference::new(
@@ -49,20 +49,22 @@
 //!     SphinxType::Python(PyRole::Method),
 //!     SphinxPriority::Standard,
 //!     "library/stdtypes.html#$",
-//!     "-");
+//!     "-",
+//! );
 //! let lower_reference = SphinxReference::new(
 //!     "str.lower",
 //!     SphinxType::Python(PyRole::Method),
 //!     SphinxPriority::Standard,
 //!     "library/stdtypes.html#$",
-//!     "-");
+//!     "-",
+//! );
 //!
 //! let mut buffer = Vec::new();
 //!
 //! let mut cursor = Cursor::new(buffer);
+//!
 //! // the capacity is just to preallocate the internal buffer, it can be anything
 //! let mut writer = PlainTextSphinxInventoryWriter::from_header(&header, 2, true);
-//!
 //!
 //! // add the references to the writer
 //! writer.add_reference(&join_reference);
@@ -74,15 +76,18 @@
 //!
 //! let written = String::from_utf8(cursor.into_inner()).unwrap();
 //!
-//! assert_eq!(&written, "# Sphinx inventory version 2
+//! assert_eq!(
+//!     &written,
+//!     "# Sphinx inventory version 2
 //! ## Project: Sphinx Inv
 //! ## Version: 0.2.0
 //! ## The remainder of this file is compressed using zlib.
 //! str.join py:method 1 library/stdtypes.html#$ -
 //! str.lower py:method 1 library/stdtypes.html#$ -
-//! ");
+//! "
+//! );
 //!
-//! let mut cursor = Cursor::new( written);
+//! let mut cursor = Cursor::new(written);
 //!
 //! let mut reader = PlainTextSphinxInventoryReader::from_reader(cursor).unwrap();
 //!
@@ -90,14 +95,15 @@
 //!
 //! assert_eq!(reader.next().unwrap().unwrap(), join_reference);
 //! assert_eq!(reader.next().unwrap().unwrap(), lower_reference);
-//!
 //! ```
 //!
 //!
 //! ## Format Description
 //!
 //! As noted by Skinn et al. currently, a inventory file (in the v2 format) has 2 parts:
-//! the header and the body.
+//!
+//! - the header
+//! - the body
 //!
 //! ### Header description
 //!
@@ -123,9 +129,9 @@
 //! For more indepth explanation of the format, please see
 //! [spobjinv](https://sphobjinv.readthedocs.io/en/stable/syntax.html)
 //!
-//! [^*]: technically it doesn't as long as the byte offsets are the same since the Sphinx
+//! [^*]: technically it matter doesn't as long as the byte offsets are the same since the Sphinx
 //! implementation just skips a known amount of bytes, but this is a impl detail so
-//! we recommend that the format is still followed
+//! we recommend following the format.
 //!
 //!
 //!### Body format
@@ -144,7 +150,6 @@
 //! ```txt
 //! str.join py:method 1 library/stdtypes.html#$ -
 //! ```
-//!
 
 mod error;
 mod header;
@@ -186,6 +191,8 @@ pub use writers::PlainTextSphinxInventoryWriter;
 /// between object types and names between different languages
 pub use roles::SphinxType;
 
+/// The search priority of the associated object used by Sphinx
 pub use priority::SphinxPriority;
 
+/// The various known domains and roles used in sphinx inventory files
 pub use roles::{CRole, CmakeRole, CppRole, JsRole, MathRole, PyRole, RstRole, SipRole, StdRole};
