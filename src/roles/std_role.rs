@@ -12,20 +12,32 @@ use crate::roles::SphinxType;
 
 #[derive(Debug, PartialEq)]
 pub enum StdRole {
+    /// Link to the specified document; [see more](https://www.sphinx-doc.org/en/master/usage/referencing.html#role-doc)
     Doc,
 
+    /// A label, usually for an equasion or figure. [see more](https://www.sphinx-doc.org/en/master/usage/referencing.html#role-doc)
     Label,
 
+    /// Reference to a term in a glossary. [see more](https://www.sphinx-doc.org/en/master/usage/referencing.html#role-term)
     Term,
 
+    /// Describes a command line argument or switch. [see more](https://www.sphinx-doc.org/en/master/usage/domains/standard.html#directive-option)
+    Option,
+
+    /// Deprecated alias to [`StdRole::Option`]
     Cmdoption,
 
+    /// A command you can use in a pdb session. [see more](https://docs.python.org/3/library/pdb.html#debugger-commands)
     Pdbcommand,
 
+    /// The name of a grammar token [see more](https://www.sphinx-doc.org/en/master/usage/referencing.html#role-token)
     Token,
 
+    /// numeric byte code referring to a python operation [see more](https://docs.python.org/3/library/dis.html#dis.Instruction.opcode)
     Opcode,
 
+    /// I can't actually find any docs for this or where it came
+    /// from so... TBC?
     MonitoringEvent,
 
     /// Describes an environment variable that the documented code
@@ -39,7 +51,7 @@ impl Display for StdRole {
             StdRole::Doc => "doc",
             StdRole::Label => "label",
             StdRole::Term => "term",
-            StdRole::Cmdoption => "cmdoption",
+            StdRole::Cmdoption | StdRole::Option => "cmdoption",
             StdRole::Pdbcommand => "pdbcommand",
             StdRole::Token => "token",
             StdRole::Opcode => "opcode",
