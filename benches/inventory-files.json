@@ -1,0 +1,1022 @@
+[
+  {
+    "name": "plone",
+    "url": "https://6.docs.plone.org/objects.inv"
+  },
+  {
+    "name": "abrt",
+    "url": "https://abrt.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "aesara",
+    "url": "https://aesara.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "alabaster",
+    "url": "https://alabaster.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "sqlalchemy",
+    "url": "https://alembic.sqlalchemy.org/en/latest/objects.inv"
+  },
+  {
+    "name": "gda",
+    "url": "https://alfred.diamond.ac.uk/documentation/manuals/GDA_Developer_Guide/master/objects.inv"
+  },
+  {
+    "name": "arcade",
+    "url": "https://api.arcade.academy/en/stable/objects.inv"
+  },
+  {
+    "name": "ubuntu",
+    "url": "https://apt-team.pages.debian.net/python-apt/objects.inv"
+  },
+  {
+    "name": "arblib",
+    "url": "https://arblib.org/objects.inv"
+  },
+  {
+    "name": "aria2",
+    "url": "https://aria2.github.io/manual/en/html/objects.inv"
+  },
+  {
+    "name": "asvin",
+    "url": "https://asvin.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "autofac",
+    "url": "https://autofac.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "blinker",
+    "url": "https://blinker.readthedocs.io/en/stable/objects.inv"
+  },
+  {
+    "name": "blocks",
+    "url": "https://blocks.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "cakephp",
+    "url": "https://book.cakephp.org/phinx/0/en/objects.inv"
+  },
+  {
+    "name": "bootstrap-datepicker",
+    "url": "https://bootstrap-datepicker.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "breathe",
+    "url": "https://breathe.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "bronto",
+    "url": "https://bronto-javasphinx.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "bugzilla",
+    "url": "https://bugzilla.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "cartopy",
+    "url": "https://cartopy.readthedocs.io/stable/objects.inv"
+  },
+  {
+    "name": "citeproc-js",
+    "url": "https://citeproc-js.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "click",
+    "url": "https://click.palletsprojects.com/en/stable/objects.inv"
+  },
+  {
+    "name": "cmake",
+    "url": "https://cmake.org/cmake/help/git-master/objects.inv"
+  },
+  {
+    "name": "cryptography",
+    "url": "https://cryptography.io/en/latest/objects.inv"
+  },
+  {
+    "name": "cython",
+    "url": "https://cython.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "damask",
+    "url": "https://damask-multiphysics.org/objects.inv"
+  },
+  {
+    "name": "deap",
+    "url": "https://deap.readthedocs.io/en/master/objects.inv"
+  },
+  {
+    "name": "python-dev-guide",
+    "url": "https://devguide.python.org/objects.inv"
+  },
+  {
+    "name": "enoslib",
+    "url": "https://discovery.gitlabpages.inria.fr/enoslib/objects.inv"
+  },
+  {
+    "name": "django-cas",
+    "url": "https://djangocas.dev/docs/latest/objects.inv"
+  },
+  {
+    "name": "django-q",
+    "url": "https://django-q.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "dnf",
+    "url": "https://dnf.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "coreboot",
+    "url": "https://doc.coreboot.org/objects.inv"
+  },
+  {
+    "name": "dataiku",
+    "url": "https://doc.dataiku.com/dss/latest/objects.inv"
+  },
+  {
+    "name": "freefem",
+    "url": "https://doc.freefem.org/objects.inv"
+  },
+  {
+    "name": "pypi",
+    "url": "https://doc.pypy.org/objects.inv"
+  },
+  {
+    "name": "sagemath",
+    "url": "https://doc.sagemath.org/html/en/reference/groups/objects.inv"
+  },
+  {
+    "name": "aiohttp",
+    "url": "https://docs.aiohttp.org/en/stable/objects.inv"
+  },
+  {
+    "name": "ansible",
+    "url": "https://docs.ansible.com/projects/ansible/latest/objects.inv"
+  },
+  {
+    "name": "astropy",
+    "url": "https://docs.astropy.org/en/stable/objects.inv"
+  },
+  {
+    "name": "boto3",
+    "url": "https://docs.aws.amazon.com/boto3/latest/objects.inv"
+  },
+  {
+    "name": "bigchaindb",
+    "url": "https://docs.bigchaindb.com/en/latest/objects.inv"
+  },
+  {
+    "name": "blender",
+    "url": "https://docs.blender.org/api/current/objects.inv"
+  },
+  {
+    "name": "bokeh",
+    "url": "https://docs.bokeh.org/en/latest/objects.inv"
+  },
+  {
+    "name": "buildbot",
+    "url": "https://docs.buildbot.net/latest/objects.inv"
+  },
+  {
+    "name": "celeryq",
+    "url": "https://docs.celeryq.dev/projects/kombu/en/stable/objects.inv"
+  },
+  {
+    "name": "ceph",
+    "url": "https://docs.ceph.com/en/latest/objects.inv"
+  },
+  {
+    "name": "chainer",
+    "url": "https://docs.chainer.org/en/stable/objects.inv"
+  },
+  {
+    "name": "cherrypy",
+    "url": "https://docs.cherrypy.dev/en/latest/objects.inv"
+  },
+  {
+    "name": "ckan",
+    "url": "https://docs.ckan.org/en/2.11/objects.inv"
+  },
+  {
+    "name": "cloud-init",
+    "url": "https://docs.cloud-init.io/en/latest/objects.inv"
+  },
+  {
+    "name": "conda",
+    "url": "https://docs.conda.io/projects/conda/en/latest/objects.inv"
+  },
+  {
+    "name": "confluent",
+    "url": "https://docs.confluent.io/platform/current/objects.inv"
+  },
+  {
+    "name": "chouchdb",
+    "url": "https://docs.couchdb.org/en/stable/objects.inv"
+  },
+  {
+    "name": "cupy",
+    "url": "https://docs.cupy.dev/en/stable/objects.inv"
+  },
+  {
+    "name": "dask",
+    "url": "https://docs.dask.org/en/stable/objects.inv"
+  },
+  {
+    "name": "django-cms",
+    "url": "https://docs.django-cms.org/en/stable/objects.inv"
+  },
+  {
+    "name": "django",
+    "url": "https://docs.djangoproject.com/en/6.0/objects.inv"
+  },
+  {
+    "name": "easybuild",
+    "url": "https://docs.easybuild.io/objects.inv"
+  },
+  {
+    "name": "chaco",
+    "url": "https://docs.enthought.com/chaco/objects.inv"
+  },
+  {
+    "name": "mayavi",
+    "url": "https://docs.enthought.com/mayavi/tvtk/objects.inv"
+  },
+  {
+    "name": "fabfile",
+    "url": "https://docs.fabfile.org/en/latest/objects.inv"
+  },
+  {
+    "name": "flatpak",
+    "url": "https://docs.flatpak.org/en/latest/objects.inv"
+  },
+  {
+    "name": "generic-mapping-tools",
+    "url": "https://docs.generic-mapping-tools.org/latest/objects.inv"
+  },
+  {
+    "name": "getpelican",
+    "url": "https://docs.getpelican.com/en/latest/objects.inv"
+  },
+  {
+    "name": "godotengine",
+    "url": "https://docs.godotengine.org/en/stable/objects.inv"
+  },
+  {
+    "name": "guzzlephp",
+    "url": "https://docs.guzzlephp.org/en/stable/objects.inv"
+  },
+  {
+    "name": "h5py",
+    "url": "https://docs.h5py.org/en/stable/objects.inv"
+  },
+  {
+    "name": "idris-lang",
+    "url": "https://docs.idris-lang.org/en/latest/objects.inv"
+  },
+  {
+    "name": "jupyter",
+    "url": "https://docs.jupyter.org/en/latest/objects.inv"
+  },
+  {
+    "name": "mailman3",
+    "url": "https://docs.mailman3.org/en/latest/objects.inv"
+  },
+  {
+    "name": "hyperkitty",
+    "url": "https://docs.mailman3.org/projects/hyperkitty/en/latest/objects.inv"
+  },
+  {
+    "name": "makotemplates",
+    "url": "https://docs.makotemplates.org/en/latest/objects.inv"
+  },
+  {
+    "name": "mathjax",
+    "url": "https://docs.mathjax.org/en/latest/objects.inv"
+  },
+  {
+    "name": "mediagoblin",
+    "url": "https://docs.mediagoblin.org/en/stable/objects.inv"
+  },
+  {
+    "name": "mesa3d",
+    "url": "https://docs.mesa3d.org/objects.inv"
+  },
+  {
+    "name": "micropy",
+    "url": "https://docs.micropython.org/en/latest/objects.inv"
+  },
+  {
+    "name": "mockery",
+    "url": "https://docs.mockery.io/en/latest/objects.inv"
+  },
+  {
+    "name": "mopidy",
+    "url": "https://docs.mopidy.com/stable/objects.inv"
+  },
+  {
+    "name": "myhdl",
+    "url": "https://docs.myhdl.org/en/stable/objects.inv"
+  },
+  {
+    "name": "netgate",
+    "url": "https://docs.netgate.com/tnsr/en/latest/platforms/objects.inv"
+  },
+  {
+    "name": "nextclous",
+    "url": "https://docs.nextcloud.com/server/latest/user_manual/en/objects.inv"
+  },
+  {
+    "name": "obspy",
+    "url": "https://docs.obspy.org/objects.inv"
+  },
+  {
+    "name": "opencv",
+    "url": "https://docs.opencv.org/5.0/objects.inv"
+  },
+  {
+    "name": "openvswitch",
+    "url": "https://docs.openvswitch.org/en/latest/objects.inv"
+  },
+  {
+    "name": "pragure",
+    "url": "https://docs.pagure.org/copr.copr/objects.inv"
+  },
+  {
+    "name": "panda3d",
+    "url": "https://docs.panda3d.org/1.10/objects.inv"
+  },
+  {
+    "name": "peewee",
+    "url": "https://docs.peewee-orm.com/en/latest/objects.inv"
+  },
+  {
+    "name": "phpunit",
+    "url": "https://docs.phpunit.de/en/13.2/objects.inv"
+  },
+  {
+    "name": "platformio",
+    "url": "https://docs.platformio.org/en/latest/objects.inv"
+  },
+  {
+    "name": "podman",
+    "url": "https://docs.podman.io/en/latest/objects.inv"
+  },
+  {
+    "name": "pycantonese",
+    "url": "https://docs.pycantonese.org/stable/objects.inv"
+  },
+  {
+    "name": "pyinvoke",
+    "url": "https://docs.pyinvoke.org/en/stable/objects.inv"
+  },
+  {
+    "name": "pylangacq",
+    "url": "https://docs.pylangacq.org/stable/objects.inv"
+  },
+  {
+    "name": "pylons",
+    "url": "https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/objects.inv"
+  },
+  {
+    "name": "pyramid",
+    "url": "https://docs.pylonsproject.org/projects/pyramid/en/latest/objects.inv"
+  },
+  {
+    "name": "substanced",
+    "url": "https://docs.pylonsproject.org/projects/substanced/en/latest/objects.inv"
+  },
+  {
+    "name": "pytest",
+    "url": "https://docs.pytest.org/en/stable/objects.inv"
+  },
+  {
+    "name": "python-eve",
+    "url": "https://docs.python-eve.org/en/stable/objects.inv"
+  },
+  {
+    "name": "python-3",
+    "url": "https://docs.python.org/3/objects.inv"
+  },
+  {
+    "name": "pyvista",
+    "url": "https://docs.pyvista.org/objects.inv"
+  },
+  {
+    "name": "qtile",
+    "url": "https://docs.qtile.org/en/stable/objects.inv"
+  },
+  {
+    "name": "read-the-docs",
+    "url": "https://docs.readthedocs.com/platform/stable/objects.inv"
+  },
+  {
+    "name": "salt",
+    "url": "https://docs.saltproject.io/en/latest/objects.inv"
+  },
+  {
+    "name": "scrapy",
+    "url": "https://docs.scrapy.org/en/latest/objects.inv"
+  },
+  {
+    "name": "sepal",
+    "url": "https://docs.sepal.io/en/latest/objects.inv"
+  },
+  {
+    "name": "spring-python",
+    "url": "https://docs.spring.io/spring-python/1.2.x/sphinx/html/objects.inv"
+  },
+  {
+    "name": "spyder",
+    "url": "https://docs.spyder-ide.org/current/objects.inv"
+  },
+  {
+    "name": "sqlalchemy",
+    "url": "https://docs.sqlalchemy.org/en/20/objects.inv"
+  },
+  {
+    "name": "sulu",
+    "url": "https://docs.sulu.io/3.x/objects.inv"
+  },
+  {
+    "name": "sunpy",
+    "url": "https://docs.sunpy.org/en/stable/objects.inv"
+  },
+  {
+    "name": "sympy",
+    "url": "https://docs.sympy.org/latest/objects.inv"
+  },
+  {
+    "name": "syncthing",
+    "url": "https://docs.syncthing.net/objects.inv"
+  },
+  {
+    "name": "threatconnect",
+    "url": "https://docs.threatconnect.com/en/latest/objects.inv"
+  },
+  {
+    "name": "translatehouse",
+    "url": "https://docs.translatehouse.org/projects/translate-toolkit/en/latest/objects.inv"
+  },
+  {
+    "name": "tuleap",
+    "url": "https://docs.tuleap.com/objects.inv"
+  },
+  {
+    "name": "twisted",
+    "url": "https://docs.twisted.org/en/stable/objects.inv"
+  },
+  {
+    "name": "typo3",
+    "url": "https://docs.typo3.org/m/typo3/tutorial-getting-started/14.3/en-us/objects.inv"
+  },
+  {
+    "name": "veyon",
+    "url": "https://docs.veyon.io/en/latest/objects.inv"
+  },
+  {
+    "name": "w3af",
+    "url": "https://docs.w3af.org/en/latest/objects.inv"
+  },
+  {
+    "name": "wagtail",
+    "url": "https://docs.wagtail.org/en/stable/objects.inv"
+  },
+  {
+    "name": "weblate",
+    "url": "https://docs.weblate.org/en/latest/objects.inv"
+  },
+  {
+    "name": "zeek",
+    "url": "https://docs.zeek.org/en/current/objects.inv"
+  },
+  {
+    "name": "ubuntu",
+    "url": "https://documentation.ubuntu.com/project/objects.inv"
+  },
+  {
+    "name": "objects",
+    "url": "https://documen.tician.de/codepy/objects.inv"
+  },
+  {
+    "name": "hedge",
+    "url": "https://documen.tician.de/hedge/objects.inv"
+  },
+  {
+    "name": "meshpy",
+    "url": "https://documen.tician.de/meshpy/objects.inv"
+  },
+  {
+    "name": "pycuda",
+    "url": "https://documen.tician.de/pycuda/objects.inv"
+  },
+  {
+    "name": "pyopencl",
+    "url": "https://documen.tician.de/pyopencl/objects.inv"
+  },
+  {
+    "name": "pyublas",
+    "url": "https://documen.tician.de/pyublas/objects.inv"
+  },
+  {
+    "name": "pyfvisfile",
+    "url": "https://documen.tician.de/pyvisfile/objects.inv"
+  },
+  {
+    "name": "ghc",
+    "url": "https://downloads.haskell.org/ghc/latest/docs/users_guide/objects.inv"
+  },
+  {
+    "name": "e-cidadania",
+    "url": "https://e-cidadania.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "certbot",
+    "url": "https://eff-certbot.readthedocs.io/en/stable/objects.inv"
+  },
+  {
+    "name": "eswp3",
+    "url": "https://eswp3.readthedocs.io/en/master/objects.inv"
+  },
+  {
+    "name": "exhale",
+    "url": "https://exhale.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "fairlearn",
+    "url": "https://fairlearn.org/main/objects.inv"
+  },
+  {
+    "name": "faker",
+    "url": "https://faker.readthedocs.io/en/master/objects.inv"
+  },
+  {
+    "name": "feature-engine",
+    "url": "https://feature-engine.trainindata.com/en/latest/objects.inv"
+  },
+  {
+    "name": "fidimag",
+    "url": "https://fidimag.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "flake8",
+    "url": "https://flake8.pycqa.org/en/latest/objects.inv"
+  },
+  {
+    "name": "flask",
+    "url": "https://flask.palletsprojects.com/en/stable/objects.inv"
+  },
+  {
+    "name": "fluiddyn",
+    "url": "https://fluiddyn.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "fluidsim",
+    "url": "https://fluidsim.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "frm2",
+    "url": "https://forge.frm2.tum.de/nicos/doc/nicos-master/objects.inv"
+  },
+  {
+    "name": "freevo",
+    "url": "https://freevo.github.io/kaa-base/objects.inv"
+  },
+  {
+    "name": "gallium",
+    "url": "https://gallium.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "getfem",
+    "url": "https://getfem.org/objects.inv"
+  },
+  {
+    "name": "glances",
+    "url": "https://glances.readthedocs.io/en/develop/objects.inv"
+  },
+  {
+    "name": "gpaw",
+    "url": "https://gpaw.readthedocs.io/objects.inv"
+  },
+  {
+    "name": "dataverse",
+    "url": "https://guides.dataverse.org/en/latest/objects.inv"
+  },
+  {
+    "name": "handbook",
+    "url": "https://handbook.selflanguage.org/2024.1/objects.inv"
+  },
+  {
+    "name": "hekad",
+    "url": "https://hekad.readthedocs.io/en/v0.10.0/objects.inv"
+  },
+  {
+    "name": "hyperleger-fabric",
+    "url": "https://hyperledger-fabric.readthedocs.io/en/release-2.5/objects.inv"
+  },
+  {
+    "name": "inkscape",
+    "url": "https://inkscape-manuals.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "jinja",
+    "url": "https://jinja.palletsprojects.com/en/stable/objects.inv"
+  },
+  {
+    "name": "jupyter",
+    "url": "https://jupyter-book.readthedocs.io/v1/objects.inv"
+  },
+  {
+    "name": "jupyterhub",
+    "url": "https://jupyterhub.readthedocs.io/en/stable/objects.inv"
+  },
+  {
+    "name": "jython",
+    "url": "https://jython.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "lasagne",
+    "url": "https://lasagne.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "lassoguide",
+    "url": "https://lassoguide.com/objects.inv"
+  },
+  {
+    "name": "leo-editor",
+    "url": "https://leo-editor.github.io/leo-editor/objects.inv"
+  },
+  {
+    "name": "libceed",
+    "url": "https://libceed.org/en/latest/objects.inv"
+  },
+  {
+    "name": "linguistica",
+    "url": "https://linguistica.readthedocs.io/stable/objects.inv"
+  },
+  {
+    "name": "llvm",
+    "url": "https://llvm.org/docs/objects.inv"
+  },
+  {
+    "name": "lmod",
+    "url": "https://lmod.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "calibre",
+    "url": "https://manual.calibre-ebook.com/objects.inv"
+  },
+  {
+    "name": "gromacs",
+    "url": "https://manual.gromacs.org/documentation/2026.2/objects.inv"
+  },
+  {
+    "name": "mapserver",
+    "url": "https://mapserver.org/objects.inv"
+  },
+  {
+    "name": "matplotlib",
+    "url": "https://matplotlib.org/stable/objects.inv"
+  },
+  {
+    "name": "micca",
+    "url": "https://micca.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "micro",
+    "url": "https://micro-framework.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "mink",
+    "url": "https://mink.behat.org/en/latest/objects.inv"
+  },
+  {
+    "name": "mirrorbrain",
+    "url": "https://mirrorbrain-docs.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "mitiq",
+    "url": "https://mitiq.readthedocs.io/en/stable/objects.inv"
+  },
+  {
+    "name": "mne",
+    "url": "https://mne.tools/stable/objects.inv"
+  },
+  {
+    "name": "modwsig",
+    "url": "https://modwsgi.readthedocs.io/en/master/objects.inv"
+  },
+  {
+    "name": "moin-20",
+    "url": "https://moin-20.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "lti",
+    "url": "https://momotor.org/doc/lti/objects.inv"
+  },
+  {
+    "name": "pweave",
+    "url": "https://mpastell.com/pweave/objects.inv"
+  },
+  {
+    "name": "mpi4py",
+    "url": "https://mpi4py.readthedocs.io/en/stable/objects.inv"
+  },
+  {
+    "name": "mpmath",
+    "url": "https://mpmath.org/doc/current/objects.inv"
+  },
+  {
+    "name": "mybinder",
+    "url": "https://mybinder.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "mypy",
+    "url": "https://mypy.readthedocs.io/en/stable/objects.inv"
+  },
+  {
+    "name": "ndsim",
+    "url": "https://ndnsim.net/current/objects.inv"
+  },
+  {
+    "name": "networkx",
+    "url": "https://networkx.org/documentation/stable/objects.inv"
+  },
+  {
+    "name": "nghttp2",
+    "url": "https://nghttp2.org/documentation/objects.inv"
+  },
+  {
+    "name": "nlpy",
+    "url": "https://nlpy.sourceforge.net/objects.inv"
+  },
+  {
+    "name": "genomedata",
+    "url": "https://noble.gs.washington.edu/proj/genomedata/doc/1.3.3/objects.inv"
+  },
+  {
+    "name": "segway",
+    "url": "https://noble.gs.washington.edu/proj/segway/doc/1.1.0/objects.inv"
+  },
+  {
+    "name": "nose",
+    "url": "https://nose.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "numpy",
+    "url": "https://numpy.org/doc/stable/objects.inv"
+  },
+  {
+    "name": "poenfast",
+    "url": "https://openfast.readthedocs.io/en/main/objects.inv"
+  },
+  {
+    "name": "openturns",
+    "url": "https://openturns.github.io/openturns/latest/objects.inv"
+  },
+  {
+    "name": "opnfvdocsdemo",
+    "url": "https://opnfvdocsdemo.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "packaging",
+    "url": "https://packaging.python.org/en/latest/objects.inv"
+  },
+  {
+    "name": "pageperso",
+    "url": "https://pageperso.lis-lab.fr/~edouard.thiel/ez-draw/doc/en/html/objects.inv"
+  },
+  {
+    "name": "pandas",
+    "url": "https://pandas.pydata.org/docs/objects.inv"
+  },
+  {
+    "name": "phasefieldx",
+    "url": "https://phasefieldx.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "phpword",
+    "url": "https://phpword.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "picamera",
+    "url": "https://picamera.readthedocs.io/en/release-1.13/objects.inv"
+  },
+  {
+    "name": "pillow",
+    "url": "https://pillow.readthedocs.io/en/stable/objects.inv"
+  },
+  {
+    "name": "pypa",
+    "url": "https://pip.pypa.io/en/stable/objects.inv"
+  },
+  {
+    "name": "pradyunsg",
+    "url": "https://pradyunsg.me/furo/objects.inv"
+  },
+  {
+    "name": "pros",
+    "url": "https://pros.cs.purdue.edu/v5/objects.inv"
+  },
+  {
+    "name": "psicode",
+    "url": "https://psicode.org/psi4manual/master/objects.inv"
+  },
+  {
+    "name": "pydata",
+    "url": "https://pydata-sphinx-theme.readthedocs.io/en/stable/objects.inv"
+  },
+  {
+    "name": "pyemd",
+    "url": "https://pyemd.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "pyglet",
+    "url": "https://pyglet.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "pygments",
+    "url": "https://pygments.org/objects.inv"
+  },
+  {
+    "name": "pynacl",
+    "url": "https://pynacl.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "pypubsub",
+    "url": "https://pypubsub.readthedocs.io/en/v4.0.3/objects.inv"
+  },
+  {
+    "name": "pyre",
+    "url": "https://pyre.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "pystra",
+    "url": "https://pystra.github.io/pystra/objects.inv"
+  },
+  {
+    "name": "arviz",
+    "url": "https://python.arviz.org/projects/plots/en/latest/objects.inv"
+  },
+  {
+    "name": "aspectlib",
+    "url": "https://python-aspectlib.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "flask-open-id",
+    "url": "https://pythonhosted.org/Flask-OpenID/objects.inv"
+  },
+  {
+    "name": "pyvista",
+    "url": "https://pyvisa.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "pywavelets",
+    "url": "https://pywavelets.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "debian",
+    "url": "https://qa.pages.debian.net/distro-tracker/objects.inv"
+  },
+  {
+    "name": "quex",
+    "url": "https://quex.sourceforge.net/doc/html/objects.inv"
+  },
+  {
+    "name": "qutip",
+    "url": "https://qutip.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "gensim",
+    "url": "https://radimrehurek.com/gensim/objects.inv"
+  },
+  {
+    "name": "read-the-docs",
+    "url": "https://releases.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "renderdoc",
+    "url": "https://renderdoc.org/docs/objects.inv"
+  },
+  {
+    "name": "requests",
+    "url": "https://requests.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "ring-lang",
+    "url": "https://ring-lang.github.io/doc1.20/objects.inv"
+  },
+  {
+    "name": "apsw",
+    "url": "https://rogerbinns.github.io/apsw/objects.inv"
+  },
+  {
+    "name": "spark",
+    "url": "https://runawayhorse001.github.io/LearningApacheSpark/objects.inv"
+  },
+  {
+    "name": "sphinx",
+    "url": "https://runawayhorse001.github.io/SphinxGithub/objects.inv"
+  },
+  {
+    "name": "devel",
+    "url": "https://rxdock.gitlab.io/documentation/devel/html/objects.inv"
+  },
+  {
+    "name": "bootstrap",
+    "url": "https://ryan-roemer.github.io/sphinx-bootstrap-theme/objects.inv"
+  },
+  {
+    "name": "scapy",
+    "url": "https://scapy.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "scikit-learn",
+    "url": "https://scikit-learn.org/stable/objects.inv"
+  },
+  {
+    "name": "scipy",
+    "url": "https://scipy.github.io/devdocs/objects.inv"
+  },
+  {
+    "name": "seaborn",
+    "url": "https://seaborn.pydata.org/objects.inv"
+  },
+  {
+    "name": "searx",
+    "url": "https://searx.github.io/searx/objects.inv"
+  },
+  {
+    "name": "setuptools",
+    "url": "https://setuptools.pypa.io/en/latest/objects.inv"
+  },
+  {
+    "name": "simgrid",
+    "url": "https://simgrid.org/doc/latest/objects.inv"
+  },
+  {
+    "name": "simpy",
+    "url": "https://simpy.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "argparse",
+    "url": "https://sphinx-argparse.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "autoapi",
+    "url": "https://sphinx-autoapi.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "sphinx-gallery",
+    "url": "https://sphinx-gallery.github.io/stable/objects.inv"
+  },
+  {
+    "name": "sphinx-rtd-theme",
+    "url": "https://sphinx-rtd-theme.readthedocs.io/en/stable/objects.inv"
+  },
+  {
+    "name": "sphinx-tabs",
+    "url": "https://sphinx-tabs.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "spotbugs",
+    "url": "https://spotbugs.readthedocs.io/en/stable/objects.inv"
+  },
+  {
+    "name": "sqlparse",
+    "url": "https://sqlparse.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "tango-controls",
+    "url": "https://tango-controls.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "pytango",
+    "url": "https://tango-controls.readthedocs.io/projects/pytango/en/latest/objects.inv"
+  },
+  {
+    "name": "turbogears",
+    "url": "https://turbogears.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "urllib3",
+    "url": "https://urllib3.readthedocs.io/en/stable/objects.inv"
+  },
+  {
+    "name": "uwsgi",
+    "url": "https://uwsgi-docs.readthedocs.io/en/latest/objects.inv"
+  },
+  {
+    "name": "virtualenv",
+    "url": "https://virtualenv.pypa.io/en/latest/objects.inv"
+  },
+  {
+    "name": "mpipe",
+    "url": "https://vmlaker.github.io/mpipe/objects.inv"
+  },
+  {
+    "name": "pythonwildmagic",
+    "url": "https://vmlaker.github.io/pythonwildmagic/objects.inv"
+  }
+]
