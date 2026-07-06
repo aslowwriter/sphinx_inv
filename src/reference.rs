@@ -18,12 +18,23 @@ enum ReferenceString {
     Expanded(String),
 }
 
+/// A reference to something (can be either internal or external)
+/// has all the info to be serialized or deserialised from a sphinx
+/// inventory file.
 #[derive(Debug)]
 pub struct SphinxReference {
+    /// The public name of the object that user will need to use to
+    /// refer to it.
     pub name: String,
-    // type is a reserved keyword
+
+    /// the type of the object consisting of a domain and a role.
+    /// see [`SphinxType`] for more info
     pub sphinx_type: SphinxType,
+
+    /// The priority of the object during search. Not used
+    /// in this project but required by sphinx.
     pub priority: SphinxPriority,
+
     location: ReferenceString,
     display_name: ReferenceString,
 }
@@ -39,6 +50,7 @@ impl PartialEq for SphinxReference {
 }
 
 impl SphinxReference {
+    /// Create a new reference object
     pub fn new(
         name: &str,
         sphinx_type: SphinxType,
@@ -66,6 +78,7 @@ impl SphinxReference {
         }
     }
 
+    /// Get the expanded location. where `$` is replaced with the full name
     pub fn expanded_location(&self) -> String {
         match &self.location {
             ReferenceString::Expanded(s) => s.clone(),
@@ -73,12 +86,17 @@ impl SphinxReference {
         }
     }
 
+    /// Get the expanded display name, where `-` is a shortcut that gets
+    /// expanded to the full `name` field.
     pub fn expanded_display_name(&self) -> String {
         match &self.display_name {
             ReferenceString::Expanded(s) => s.clone(),
             ReferenceString::Minified(_) => self.name.clone(),
         }
     }
+
+    /// A minified version of the location where the fragment of the
+    /// url is truncated if it is equal to the `name field`
     pub fn minified_location(&self) -> String {
         match &self.location {
             ReferenceString::Minified(s) => s.clone(),
@@ -89,6 +107,8 @@ impl SphinxReference {
         }
     }
 
+    /// A minified version of the location where the fragment of the
+    /// display name is replaced by `-` if it is equal to the `name field`
     pub fn minified_display_name(&self) -> String {
         match &self.display_name {
             ReferenceString::Minified(s) => s.clone(),
@@ -96,6 +116,8 @@ impl SphinxReference {
         }
     }
 
+    /// Get a formatted sphinx reference with all shortcuts in
+    /// location and displayname fully expanded
     pub fn fmt_expanded(&self) -> String {
         format!(
             "{} {} {} {} {}",
@@ -107,6 +129,10 @@ impl SphinxReference {
         )
     }
 
+    /// Get a formatted sphinx reference with
+    /// location and displayname fully minified
+    /// see [`minified_display_name`] and [`minified_location`]
+    /// for more info
     pub fn fmt_minified(&self) -> String {
         format!(
             "{} {} {} {} {}",
@@ -168,6 +194,8 @@ fn name_domain_role(input: &mut &str) -> ModalResult<(String, SphinxType)> {
     Ok((format!("{first_word}{prefix_vec}"), role))
 }
 
+/// Parse a line consisting of a sphinx reference.
+/// see [`SphinxReference`] for more info.
 pub fn parse_reference(line: &str, line_num: usize) -> Result<SphinxReference, SphinxParseError> {
     let ((name, sphinx_type), prio, loc, dispname) =
         (name_domain_role, priority, uri, display_name)
