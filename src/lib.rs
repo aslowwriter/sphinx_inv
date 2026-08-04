@@ -15,7 +15,7 @@
 //! That said, we can't be guaranteed to be correct. If you find any errors, or have a valid file we
 //! can't parse please open an issue!
 //!
-//! Currently only v2 is supported.
+//! Currently only v2 of the Sphinx Inventory file format is supported.
 //!
 //! ## Usage
 //!
@@ -27,12 +27,22 @@
 //! implements [`std::io::Read`] and [`std::io::Write`] respectively. These are internally buffered
 //! so you do not have to wrap them yourself.
 //!
-//! When interacting with real `objects.inv` files in the wild you will most likely use the base
-//! reader and writer struct, but both also have a `PlainText` variant. The only difference is that
-//! the plain text versions don't encode/decode the data in zlib like the files do. This is mostly
-//! useful for debugging/testing. In the following examples we will use the plain text versions and
+//! In previous version we had separate structs for the zlib and plain-text versions, but these
+//! have now all been combined into one reader and one writer. The reader will detect which is
+//! necessary based on the description in the header. For example if the header metnions:
+//!
+//! `# The remainder of this file is compressed using zlib`
+//!
+//! it will automatically decompress the body, whereas if it says
+//!
+//! `# The remainder of this file is compressed using plain-text`
+//!
+//! it will use plain text reading. The writer will write the correct header along with the body in
+//! the correct format based on the [`WriteFormat`] provided at finalisation.
+//!
+//! In the following examples we will use the plain text versions and
 //! the [`std::io::Cursor`] to make it easier to display the results, but the code should work
-//! basically unchanged by switching to a [`std::fs::File`] and the base readers and writers.
+//! basically unchanged by switching to a [`std::fs::File`].
 //!
 //! ## Examples
 //!
@@ -43,7 +53,7 @@
 //! # use std::fs::File;
 //! # use std::io::{Cursor, Read, Write};
 //! #
-//! let header = InventoryHeader::new("Sphinx Inv", "0.2.0");
+//! let header = InventoryHeader::new("Sphinx Inv", "0.2.0", "plain-text");
 //! let join_reference = SphinxReference::new(
 //!     "str.join",
 //!     SphinxType::Python(PyRole::Method),
@@ -64,7 +74,7 @@
 //! let mut cursor = Cursor::new(buffer);
 //!
 //! // the capacity is just to preallocate the internal buffer, it can be anything
-//! let mut writer = PlainTextSphinxInventoryWriter::from_header(header.clone(), 2, true);
+//! let mut writer = SphinxInventoryWriter::from_header(header.clone(), 2, true);
 //!
 //! // add the references to the writer
 //! writer.add_reference(join_reference.clone());
@@ -72,7 +82,7 @@
 //!
 //! // add_reference on it's own only adds it to the internal buffer
 //! // nothing actually happens until you call [`SphinxInventoryWriter::finalize`]
-//! writer.finalize(&mut cursor).unwrap();
+//! writer.finalize(&mut cursor, &WriteFormat::Plain).unwrap();
 //!
 //! let written = String::from_utf8(cursor.into_inner()).unwrap();
 //!
@@ -81,7 +91,7 @@
 //!     "# Sphinx inventory version 2
 //! ## Project: Sphinx Inv
 //! ## Version: 0.2.0
-//! ## The remainder of this file is compressed using zlib.
+//! ## The remainder of this file is compressed using plain-text.
 //! str.join py:method 1 library/stdtypes.html#$ -
 //! str.lower py:method 1 library/stdtypes.html#$ -
 //! "
@@ -89,7 +99,7 @@
 //!
 //! let mut cursor = Cursor::new(written);
 //!
-//! let mut reader = PlainTextSphinxInventoryReader::from_reader(cursor).unwrap();
+//! let mut reader = SphinxInventoryReader::from_reader(cursor).unwrap();
 //!
 //! assert_eq!(&header, reader.header());
 //!
@@ -175,17 +185,11 @@ pub use header::InventoryHeader;
 /// The main entrypoint to this crate, used to read and parse sphinx reference data
 pub use readers::SphinxInventoryReader;
 
-/// plaintext version of [`SphinxInventoryReader`] mainly used for testing and demoing
-pub use readers::PlainTextSphinxInventoryReader;
-
 /// The main data struct of this crate with the necessary information to link to external
 pub use reference::SphinxReference;
 
 /// The main entrypoint to this crate, used to write and format sphinx reference data
-pub use writers::SphinxInventoryWriter;
-
-/// plaintext version of [`SphinxInventoryWriter`] mainly used for testing and demoing
-pub use writers::PlainTextSphinxInventoryWriter;
+pub use writers::{SphinxInventoryWriter, WriteFormat};
 
 /// type used to parse `{domain}:{roles}` information provided by Sphinx used to disembguate
 /// between object types and names between different languages
