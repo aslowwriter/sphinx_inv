@@ -9,7 +9,7 @@ use winnow::{
 
 use crate::SphinxType;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum HttpRole {
     Get,
     Delete,

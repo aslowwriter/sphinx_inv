@@ -12,7 +12,7 @@ use crate::roles::SphinxType;
 /// Describes a Python role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `py:{role}`
 /// if you would like one added please open a feature request
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum PyRole {
     /// documents a parameter to a function or method.
     /// [see more](https://www.sphinx-doc.org/en/master/usage/domains/python.html#directive-py-function)

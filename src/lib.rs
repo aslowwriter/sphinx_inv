@@ -64,11 +64,11 @@
 //! let mut cursor = Cursor::new(buffer);
 //!
 //! // the capacity is just to preallocate the internal buffer, it can be anything
-//! let mut writer = PlainTextSphinxInventoryWriter::from_header(&header, 2, true);
+//! let mut writer = PlainTextSphinxInventoryWriter::from_header(header.clone(), 2, true);
 //!
 //! // add the references to the writer
-//! writer.add_reference(&join_reference);
-//! writer.add_reference(&lower_reference);
+//! writer.add_reference(join_reference.clone());
+//! writer.add_reference(lower_reference.clone());
 //!
 //! // add_reference on it's own only adds it to the internal buffer
 //! // nothing actually happens until you call [`SphinxInventoryWriter::finalize`]

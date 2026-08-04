@@ -12,7 +12,7 @@ use crate::roles::SphinxType;
 /// Describes a JavaScript role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `js:{role}`
 /// if you would like one added please open a feature request
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum JsRole {
     /// This directive sets the module name for object declarations that follow after
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/javascript.html#directive-js-module)

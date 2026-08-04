@@ -10,7 +10,7 @@ use winnow::{
 use crate::roles::SphinxType;
 
 /// SIP is a tool for automatically generating Python bindings for C and C++ libraries. [see more](https://python-sip.readthedocs.io/en/stable/introduction.html)
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum SipRole {
     /// an SIP method declaration. [see more](https://python-sip.readthedocs.io/en/stable/directives.html#methodcode)
     Method,

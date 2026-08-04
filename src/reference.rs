@@ -12,7 +12,7 @@ use winnow::{
 };
 
 // basically just a wrapper so the type system can keep track of whether it's minified or not for us
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 enum ReferenceString {
     Minified(String),
     Expanded(String),
@@ -21,7 +21,7 @@ enum ReferenceString {
 /// A reference to something (can be either internal or external)
 /// has all the info to be serialized or deserialised from a sphinx
 /// inventory file.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SphinxReference {
     /// The public name of the object that user will need to use to
     /// refer to it.

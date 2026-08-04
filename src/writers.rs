@@ -5,15 +5,15 @@ use flate2::{Compression, write::ZlibEncoder};
 use crate::{InventoryHeader, SphinxReference};
 
 #[derive(Debug)]
-pub struct PlainTextSphinxInventoryWriter<'a> {
-    header: &'a InventoryHeader,
-    buffer: Vec<&'a SphinxReference>,
+pub struct PlainTextSphinxInventoryWriter {
+    header: InventoryHeader,
+    buffer: Vec<SphinxReference>,
     minimize: bool,
 }
 
-impl<'a> PlainTextSphinxInventoryWriter<'a> {
+impl PlainTextSphinxInventoryWriter {
     #[must_use]
-    pub fn from_header(header: &'a InventoryHeader, capacity: usize, minimize: bool) -> Self {
+    pub fn from_header(header: InventoryHeader, capacity: usize, minimize: bool) -> Self {
         Self {
             header,
             buffer: Vec::with_capacity(capacity),
@@ -21,7 +21,7 @@ impl<'a> PlainTextSphinxInventoryWriter<'a> {
         }
     }
 
-    pub fn add_reference(&mut self, reference: &'a SphinxReference) {
+    pub fn add_reference(&mut self, reference: SphinxReference) {
         self.buffer.push(reference);
     }
 
@@ -38,14 +38,14 @@ impl<'a> PlainTextSphinxInventoryWriter<'a> {
     }
 }
 
-pub struct SphinxInventoryWriter<'a> {
-    header: &'a InventoryHeader,
-    buffer: Vec<&'a SphinxReference>,
+pub struct SphinxInventoryWriter {
+    header: InventoryHeader,
+    buffer: Vec<SphinxReference>,
     minimize: bool,
 }
 
-impl<'a> SphinxInventoryWriter<'a> {
-    pub fn from_header(header: &'a InventoryHeader, capacity: usize, minimize: bool) -> Self {
+impl SphinxInventoryWriter {
+    pub fn from_header(header: InventoryHeader, capacity: usize, minimize: bool) -> Self {
         Self {
             header,
             buffer: Vec::with_capacity(capacity),
@@ -53,7 +53,7 @@ impl<'a> SphinxInventoryWriter<'a> {
         }
     }
 
-    pub fn add_reference(&mut self, reference: &'a SphinxReference) {
+    pub fn add_reference(&mut self, reference: SphinxReference) {
         self.buffer.push(reference);
     }
 
@@ -121,10 +121,10 @@ str.lower py:method 1 library/stdtypes.html#$ -
             "-",
         );
 
-        let mut writer = PlainTextSphinxInventoryWriter::from_header(&header, 2, true);
+        let mut writer = PlainTextSphinxInventoryWriter::from_header(header, 2, true);
 
-        writer.add_reference(&str_join_ref);
-        writer.add_reference(&str_lower_ref);
+        writer.add_reference(str_join_ref);
+        writer.add_reference(str_lower_ref);
 
         let mut cursor = Cursor::new(&mut write_buffer);
 
@@ -168,10 +168,10 @@ str.lower py:method 1 library/stdtypes.html#str.lower str.lower
             "-",
         );
 
-        let mut writer = PlainTextSphinxInventoryWriter::from_header(&header, 2, false);
+        let mut writer = PlainTextSphinxInventoryWriter::from_header(header, 2, false);
 
-        writer.add_reference(&str_join_ref);
-        writer.add_reference(&str_lower_ref);
+        writer.add_reference(str_join_ref);
+        writer.add_reference(str_lower_ref);
 
         let mut cursor = Cursor::new(&mut write_buffer);
 
@@ -207,17 +207,17 @@ str.lower py:method 1 library/stdtypes.html#str.lower str.lower
             "library/stdtypes.html#str.join",
             "-",
         );
-        let mut writer = SphinxInventoryWriter::from_header(&header, 2, true);
+        let mut writer = SphinxInventoryWriter::from_header(header.clone(), 2, true);
 
-        writer.add_reference(&str_join_ref);
-        writer.add_reference(&str_lower_ref);
+        writer.add_reference(str_join_ref.clone());
+        writer.add_reference(str_lower_ref.clone());
         writer.finalize(&mut cursor)?;
 
         cursor.set_position(0);
 
         let mut reader = SphinxInventoryReader::from_reader(cursor)?;
 
-        assert_eq!(reader.header(), &header);
+        assert_eq!(reader.header().clone(), header);
 
         assert_eq!(reader.next().unwrap()?, str_join_ref);
 

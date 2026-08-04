@@ -12,7 +12,7 @@ use crate::roles::SphinxType;
 /// Describes a Mathematics role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `math:{role}`
 /// if you would like one added please open a feature request
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum MathRole {
     /// Role for cross-referencing equations defined by math directive via their label
     /// can also refer to figures
