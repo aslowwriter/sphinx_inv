@@ -13,15 +13,13 @@ pub enum WriteFormat {
 pub struct SphinxInventoryWriter {
     header: InventoryHeader,
     buffer: Vec<SphinxReference>,
-    minimize: bool,
 }
 
 impl SphinxInventoryWriter {
-    pub fn from_header(header: InventoryHeader, capacity: usize, minimize: bool) -> Self {
+    pub fn from_header(header: InventoryHeader, capacity: usize) -> Self {
         Self {
             header,
             buffer: Vec::with_capacity(capacity),
-            minimize,
         }
     }
 
@@ -33,6 +31,7 @@ impl SphinxInventoryWriter {
         self,
         writer: &mut W,
         format: &WriteFormat,
+        minimize: bool,
     ) -> Result<(), std::io::Error> {
         let mut write_header = self.header.clone();
         write_header.compression_method_description = match format {
@@ -44,7 +43,7 @@ impl SphinxInventoryWriter {
         match format {
             WriteFormat::Plain => {
                 for reference in self.buffer {
-                    if self.minimize {
+                    if minimize {
                         writer.write_all(format!("{}\n", reference.fmt_minified()).as_bytes())?;
                     } else {
                         writer.write_all(format!("{}\n", reference.fmt_expanded()).as_bytes())?;
@@ -56,7 +55,7 @@ impl SphinxInventoryWriter {
             WriteFormat::Zlib => {
                 let mut zlib_writer = ZlibEncoder::new(writer, Compression::fast());
                 for reference in self.buffer {
-                    if self.minimize {
+                    if minimize {
                         zlib_writer
                             .write_all(format!("{}\n", reference.fmt_minified()).as_bytes())?;
                     } else {
@@ -120,14 +119,14 @@ str.lower py:method 1 library/stdtypes.html#$ -
             "-",
         );
 
-        let mut writer = SphinxInventoryWriter::from_header(header, 2, true);
+        let mut writer = SphinxInventoryWriter::from_header(header, 2);
 
         writer.add_reference(str_join_ref);
         writer.add_reference(str_lower_ref);
 
         let mut cursor = Cursor::new(&mut write_buffer);
 
-        writer.finalize(&mut cursor, &WriteFormat::Plain)?;
+        writer.finalize(&mut cursor, &WriteFormat::Plain, true)?;
 
         assert_eq!(String::from_utf8(write_buffer).unwrap(), expected);
         Ok(())
@@ -167,14 +166,14 @@ str.lower py:method 1 library/stdtypes.html#str.lower str.lower
             "-",
         );
 
-        let mut writer = SphinxInventoryWriter::from_header(header, 2, false);
+        let mut writer = SphinxInventoryWriter::from_header(header, 2);
 
         writer.add_reference(str_join_ref);
         writer.add_reference(str_lower_ref);
 
         let mut cursor = Cursor::new(&mut write_buffer);
 
-        writer.finalize(&mut cursor, &WriteFormat::Plain)?;
+        writer.finalize(&mut cursor, &WriteFormat::Plain, false)?;
 
         assert_eq!(String::from_utf8(write_buffer).unwrap(), expected);
         Ok(())
@@ -206,11 +205,11 @@ str.lower py:method 1 library/stdtypes.html#str.lower str.lower
             "library/stdtypes.html#str.join",
             "-",
         );
-        let mut writer = SphinxInventoryWriter::from_header(header.clone(), 2, true);
+        let mut writer = SphinxInventoryWriter::from_header(header.clone(), 2);
 
         writer.add_reference(str_join_ref.clone());
         writer.add_reference(str_lower_ref.clone());
-        writer.finalize(&mut cursor, &WriteFormat::Plain)?;
+        writer.finalize(&mut cursor, &WriteFormat::Plain, true)?;
 
         cursor.set_position(0);
 
