@@ -9,7 +9,7 @@ use winnow::{
 
 use crate::SphinxType;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum CmakeRole {
     /// A cmake command in a cmake file like `set()`
     /// or `add_executable()` not to be confused with a command line

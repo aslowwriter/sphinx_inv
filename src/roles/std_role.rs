@@ -10,7 +10,7 @@ use winnow::{
 
 use crate::roles::SphinxType;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum StdRole {
     /// Link to the specified document; [see more](https://www.sphinx-doc.org/en/master/usage/referencing.html#role-doc)
     Doc,

@@ -56,7 +56,7 @@ use crate::reference::word;
 /// this enum defines all the domains and roles that we know.
 /// in shpinx this is used to avoid name conflicts but for us
 /// it is not really used beyond parsing it.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum SphinxType {
     /// the default role in sphinx
     Std(StdRole),

@@ -1,4 +1,3 @@
-#[cfg(test)]
 use std::io::Read;
 use std::{
     fs::File,
@@ -12,7 +11,7 @@ use crate::{
     InventoryHeader, SphinxReference, error::SphinxInvError, header::parse_header,
     reference::parse_reference,
 };
-pub struct SphinxInventoryReader<R: std::io::Read> {
+pub struct SphinxInventoryReader<R: Read> {
     header: InventoryHeader,
     // yes we double buffer here, which is necessary to make sure
     // we don't loose any input from the first buffer when we make the zlib decoder
@@ -21,7 +20,7 @@ pub struct SphinxInventoryReader<R: std::io::Read> {
     current_line: usize, // just for reporting
 }
 
-impl<R: std::io::Read> SphinxInventoryReader<R> {
+impl<R: Read> SphinxInventoryReader<R> {
     /// Construct a [`SphinxInventoryReader`] that wraps a impl [`std::io::Read`]
     /// Note that constructing this struct WILL cause reads immediately. Upon creation
     /// we will try to read and parse the header lines from the reader. This must succeed otherwise
@@ -113,7 +112,7 @@ fn parse_line(
 }
 
 #[derive(Debug)]
-pub struct PlainTextSphinxInventoryReader<R: std::io::Read> {
+pub struct PlainTextSphinxInventoryReader<R: Read> {
     header: InventoryHeader,
     inner: Lines<BufReader<R>>,
     current_line: usize, // just for reporting
@@ -126,7 +125,7 @@ impl<R: Read> PartialEq for PlainTextSphinxInventoryReader<R> {
     }
 }
 
-impl<R: std::io::Read> Iterator for PlainTextSphinxInventoryReader<R> {
+impl<R: Read> Iterator for PlainTextSphinxInventoryReader<R> {
     type Item = Result<SphinxReference, SphinxInvError>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -134,7 +133,7 @@ impl<R: std::io::Read> Iterator for PlainTextSphinxInventoryReader<R> {
         parse_line(self.inner.next(), self.current_line)
     }
 }
-impl<R: std::io::Read> PlainTextSphinxInventoryReader<R> {
+impl<R: Read> PlainTextSphinxInventoryReader<R> {
     /// Construct a [`SphinxInventoryReader`] that wraps a impl [`std::io::Read`]
     /// Note that constructing this struct WILL cause reads immediately. Upon creation
     /// we will try to read and parse the header lines from the reader. This must succeed otherwise

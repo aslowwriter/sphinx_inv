@@ -12,7 +12,7 @@ use crate::roles::SphinxType;
 /// Describes a C++ role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `cpp:{role}`
 /// if you would like one added please open a feature request
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum CppRole {
     /// a C++ enum definition
     /// cee also [the C++ reference](https://en.cppreference.com/cpp/language/enum)

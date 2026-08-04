@@ -12,7 +12,7 @@ use crate::roles::SphinxType;
 /// Describes a RST role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `rst:{role}`
 /// if you would like one added please open a feature request
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum RstRole {
     /// Describes a reStructuredText directive.
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/restructuredtext.html#directive-rst-directive)

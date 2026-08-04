@@ -12,7 +12,7 @@ use crate::roles::SphinxType;
 /// Describes a C role that has been observed in the wild, i.e. one of the known
 /// inventory file declared at least one line with the type `c:{role}`
 /// if you would like one added please open a feature request
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum CRole {
     /// Describes a C enumerator
     /// see also [the sphinx docs](https://www.sphinx-doc.org/en/master/usage/domains/c.html#directive-c-enumerator)

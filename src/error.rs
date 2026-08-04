@@ -98,7 +98,7 @@ impl SphinxParseError {
 impl Display for SphinxParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&format!("Parsing error on line {0}: \n", self.line_num))?;
-        f.write_str(&format!("{}\n", &self.input))?;
+        f.write_str(&format!("{}\n", self.input))?;
         f.write_str(&format!("{}^\n", " ".repeat(self.location)))?;
         f.write_str(&self.message)
     }
