@@ -11,13 +11,40 @@ use crate::{
     InventoryHeader, SphinxReference, error::SphinxInvError, header::parse_header,
     reference::parse_reference,
 };
+
+#[derive(Debug)]
 pub struct SphinxInventoryReader<R: Read> {
     header: InventoryHeader,
     // yes we double buffer here, which is necessary to make sure
     // we don't loose any input from the first buffer when we make the zlib decoder
     // if we just call .into_inner we'll loose part (don't ask how I know that).
-    inner: Lines<BufReader<ZlibDecoder<BufReader<R>>>>,
+    inner: InnerReader<R>,
     current_line: usize, // just for reporting
+}
+
+#[derive(Debug)]
+pub enum InnerReader<R: Read> {
+    Plain(Lines<BufReader<R>>),
+    Zlib(Lines<BufReader<ZlibDecoder<BufReader<R>>>>),
+}
+
+impl<R: std::io::Read> Iterator for InnerReader<R> {
+    type Item = Result<String, io::Error>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self {
+            InnerReader::Plain(lines) => lines.next(),
+            InnerReader::Zlib(lines) => lines.next(),
+        }
+    }
+}
+
+impl<R: Read> PartialEq for SphinxInventoryReader<R> {
+    fn eq(&self, other: &Self) -> bool {
+        self.header == other.header
+            && std::mem::discriminant(&self.inner) == std::mem::discriminant(&other.inner)
+            && self.current_line == other.current_line
+    }
 }
 
 impl<R: Read> SphinxInventoryReader<R> {
@@ -35,7 +62,17 @@ impl<R: Read> SphinxInventoryReader<R> {
     pub fn from_reader(reader: R) -> Result<SphinxInventoryReader<R>, SphinxInvError> {
         let mut buffered_header_reader = BufReader::new(reader);
         let header = read_header(&mut buffered_header_reader)?;
-        let new_reader = BufReader::new(ZlibDecoder::new(buffered_header_reader)).lines();
+        let new_reader = if header.compression_method_description.contains("zlib") {
+            Ok(InnerReader::Zlib(
+                BufReader::new(ZlibDecoder::new(buffered_header_reader)).lines(),
+            ))
+        } else if header.compression_method_description.contains("plain-text") {
+            Ok(InnerReader::Plain(buffered_header_reader.lines()))
+        } else {
+            Err(SphinxInvError::UnsupportedCompressionMethod(
+                header.compression_method_description.clone(),
+            ))
+        }?;
 
         Ok(SphinxInventoryReader {
             header,
@@ -88,7 +125,9 @@ fn read_header<R: BufRead>(mut reader: &mut R) -> Result<InventoryHeader, Sphinx
         ));
     }
 
-    if !header.compression_method_description.contains("zlib") {
+    if !header.compression_method_description.contains("zlib")
+        && !header.compression_method_description.contains("plain-text")
+    {
         return Err(SphinxInvError::UnsupportedCompressionMethod(
             header.compression_method_description,
         ));
@@ -111,73 +150,6 @@ fn parse_line(
     }
 }
 
-#[derive(Debug)]
-pub struct PlainTextSphinxInventoryReader<R: Read> {
-    header: InventoryHeader,
-    inner: Lines<BufReader<R>>,
-    current_line: usize, // just for reporting
-}
-
-#[cfg(test)]
-impl<R: Read> PartialEq for PlainTextSphinxInventoryReader<R> {
-    fn eq(&self, other: &Self) -> bool {
-        self.header == other.header
-    }
-}
-
-impl<R: Read> Iterator for PlainTextSphinxInventoryReader<R> {
-    type Item = Result<SphinxReference, SphinxInvError>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.current_line += 1;
-        parse_line(self.inner.next(), self.current_line)
-    }
-}
-impl<R: Read> PlainTextSphinxInventoryReader<R> {
-    /// Construct a [`SphinxInventoryReader`] that wraps a impl [`std::io::Read`]
-    /// Note that constructing this struct WILL cause reads immediately. Upon creation
-    /// we will try to read and parse the header lines from the reader. This must succeed otherwise
-    /// an Err will be returned. Subsequent reads will return parsed body lines.
-    /// # Errors
-    /// This function can return Err when:
-    /// - An unsupported version format is mentinoed in the header (i.e. anything other than 2
-    ///   currently)
-    /// - the body is compressed with anything besides zlib, or the last header line does not
-    ///   mention zlib
-    /// - On any IO error while reading from the readaer
-    pub fn from_reader(reader: R) -> Result<PlainTextSphinxInventoryReader<R>, SphinxInvError> {
-        let mut buffered_reader = BufReader::new(reader);
-        let header = read_header(&mut buffered_reader)?;
-
-        Ok(PlainTextSphinxInventoryReader {
-            header,
-            inner: buffered_reader.lines(),
-            // 4 is to account for header lines
-            current_line: 4,
-        })
-    }
-
-    pub fn header(&self) -> &InventoryHeader {
-        &self.header
-    }
-}
-
-impl PlainTextSphinxInventoryReader<File> {
-    /// Construct a [`SphinxInventoryReader`] by reading the data from a [`std::path::Path`]
-    /// # Errors
-    /// This function can return Err when:
-    /// - An unsupported version format is mentinoed in the header (i.e. anything other than 2
-    ///   currently)
-    /// - the body is compressed with anything besides zlib, or the last header line does not
-    ///   mention zlib
-    /// - On any IO error while reading from the readaer
-    pub fn from_path<P: AsRef<Path>>(
-        path: P,
-    ) -> Result<SphinxInventoryReader<File>, SphinxInvError> {
-        SphinxInventoryReader::from_reader(File::open(path)?)
-    }
-}
-
 #[cfg(test)]
 mod test {
     #![allow(clippy::unwrap_used)]
@@ -189,7 +161,7 @@ mod test {
         InventoryHeader, SphinxReference, SphinxType,
         error::{SphinxInvError, SphinxParseError},
         priority::SphinxPriority,
-        readers::PlainTextSphinxInventoryReader,
+        readers::SphinxInventoryReader,
         roles::PyRole,
     };
 
@@ -198,14 +170,14 @@ mod test {
         let buffer = r"# Sphinx inventory file 2
 # Project: <project display name>
 # Version: <project version without preceding v>
-# The remainder of this file is compressed using zlib.
+# The remainder of this file is compressed using plain-text.
 str.join py:macro 1 library/stdtypes.html#$ -
 str.lower py:method 24 library/stdtypes.html#$ -
 str.lower py:method 1 library/stdtypes.html#$ -
 ";
         let reader = Cursor::new(buffer);
 
-        let mut inv_reader = PlainTextSphinxInventoryReader::from_reader(reader)?;
+        let mut inv_reader = SphinxInventoryReader::from_reader(reader)?;
 
         assert_eq!(
             *inv_reader.header(),
@@ -213,7 +185,7 @@ str.lower py:method 1 library/stdtypes.html#$ -
                 project_name: "<project display name>".to_string(),
                 project_version: "<project version without preceding v>".to_string(),
                 inventory_version: 2,
-                compression_method_description: "zlib".to_string()
+                compression_method_description: "plain-text".to_string()
             }
         );
 
@@ -244,7 +216,7 @@ str.lower py:method 1 library/stdtypes.html#$ -
         .as_bytes();
         let reader = Cursor::new(buffer);
 
-        let result = PlainTextSphinxInventoryReader::from_reader(reader);
+        let result = SphinxInventoryReader::from_reader(reader);
         assert_eq!(
             result,
             Err(SphinxInvError::UnsupportedInventoryVersion(255))
@@ -255,13 +227,13 @@ str.lower py:method 1 library/stdtypes.html#$ -
         let buffer = r"# Sphinx inventory file 2
 # Project: <project display name>
 # Version: <project version without preceding v>
-# The remainder of this file is compressed using zlib.
+# The remainder of this file is compressed using plain-text.
 str.join py:method 1 library/stdtypes.html#$ -
 str.lower py:method 1 library/stdtypes.html#$ -
 ";
         let reader = Cursor::new(buffer);
 
-        let mut inv_reader = PlainTextSphinxInventoryReader::from_reader(reader)?;
+        let mut inv_reader = SphinxInventoryReader::from_reader(reader)?;
 
         assert_eq!(
             *inv_reader.header(),
@@ -269,7 +241,7 @@ str.lower py:method 1 library/stdtypes.html#$ -
                 project_name: "<project display name>".to_string(),
                 project_version: "<project version without preceding v>".to_string(),
                 inventory_version: 2,
-                compression_method_description: "zlib".to_string()
+                compression_method_description: "plain-text".to_string()
             }
         );
 
@@ -301,7 +273,7 @@ str.lower py:method 1 library/stdtypes.html#$ -
         let buffer = r"# Sphinx inventory file 2
 # Project: <project display name>
 # Version: <project version without preceding v>
-# The remainder of this file is compressed using zlib.
+# The remainder of this file is compressed using plain-text.
 str.join py:method 1 library/stdtypes.html#$ -
 str.join asdf:method 1 library/stdtypes.html#$ -
 str.upper py:method 1 library/stdtypes.html#$ -
@@ -311,7 +283,7 @@ str.lower asdf:method 1 library/stdtypes.html#$ -
 ";
         let reader = Cursor::new(buffer);
 
-        let mut inv_reader = PlainTextSphinxInventoryReader::from_reader(reader)?;
+        let mut inv_reader = SphinxInventoryReader::from_reader(reader)?;
 
         assert_eq!(
             *inv_reader.header(),
@@ -319,7 +291,7 @@ str.lower asdf:method 1 library/stdtypes.html#$ -
                 project_name: "<project display name>".to_string(),
                 project_version: "<project version without preceding v>".to_string(),
                 inventory_version: 2,
-                compression_method_description: "zlib".to_string()
+                compression_method_description: "plain-text".to_string()
             }
         );
         let str_upper_ref = SphinxReference::new(

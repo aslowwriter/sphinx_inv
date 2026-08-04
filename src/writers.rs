@@ -4,38 +4,10 @@ use flate2::{Compression, write::ZlibEncoder};
 
 use crate::{InventoryHeader, SphinxReference};
 
-#[derive(Debug)]
-pub struct PlainTextSphinxInventoryWriter {
-    header: InventoryHeader,
-    buffer: Vec<SphinxReference>,
-    minimize: bool,
-}
-
-impl PlainTextSphinxInventoryWriter {
-    #[must_use]
-    pub fn from_header(header: InventoryHeader, capacity: usize, minimize: bool) -> Self {
-        Self {
-            header,
-            buffer: Vec::with_capacity(capacity),
-            minimize,
-        }
-    }
-
-    pub fn add_reference(&mut self, reference: SphinxReference) {
-        self.buffer.push(reference);
-    }
-
-    pub fn finalize<W: Write>(self, writer: &mut W) -> Result<(), std::io::Error> {
-        writer.write_all(format!("{}", self.header).as_bytes())?;
-        for reference in self.buffer {
-            if self.minimize {
-                writer.write_all(format!("{}\n", reference.fmt_minified()).as_bytes())?;
-            } else {
-                writer.write_all(format!("{}\n", reference.fmt_expanded()).as_bytes())?;
-            }
-        }
-        Ok(())
-    }
+#[derive(Debug, PartialEq, Clone)]
+pub enum WriteFormat {
+    Plain,
+    Zlib,
 }
 
 pub struct SphinxInventoryWriter {
@@ -57,18 +29,45 @@ impl SphinxInventoryWriter {
         self.buffer.push(reference);
     }
 
-    pub fn finalize<W: Write>(self, writer: &mut W) -> Result<&mut W, std::io::Error> {
-        writer.write_all(format!("{}", self.header).as_bytes())?;
+    pub fn finalize<W: Write>(
+        self,
+        writer: &mut W,
+        format: &WriteFormat,
+    ) -> Result<(), std::io::Error> {
+        let mut write_header = self.header.clone();
+        write_header.compression_method_description = match format {
+            WriteFormat::Plain => "plain-text".to_string(),
+            WriteFormat::Zlib => "zlib".to_string(),
+        };
+        writer.write_all(format!("{write_header}").as_bytes())?;
         writer.flush()?;
-        let mut zlib_writer = ZlibEncoder::new(writer, Compression::fast());
-        for reference in self.buffer {
-            if self.minimize {
-                zlib_writer.write_all(format!("{}\n", reference.fmt_minified()).as_bytes())?;
-            } else {
-                zlib_writer.write_all(format!("{}\n", reference.fmt_expanded()).as_bytes())?;
+        match format {
+            WriteFormat::Plain => {
+                for reference in self.buffer {
+                    if self.minimize {
+                        writer.write_all(format!("{}\n", reference.fmt_minified()).as_bytes())?;
+                    } else {
+                        writer.write_all(format!("{}\n", reference.fmt_expanded()).as_bytes())?;
+                    }
+                }
+                writer.flush()?;
+                Ok(())
+            }
+            WriteFormat::Zlib => {
+                let mut zlib_writer = ZlibEncoder::new(writer, Compression::fast());
+                for reference in self.buffer {
+                    if self.minimize {
+                        zlib_writer
+                            .write_all(format!("{}\n", reference.fmt_minified()).as_bytes())?;
+                    } else {
+                        zlib_writer
+                            .write_all(format!("{}\n", reference.fmt_expanded()).as_bytes())?;
+                    }
+                }
+                zlib_writer.finish()?;
+                Ok(())
             }
         }
-        zlib_writer.finish()
     }
 }
 
@@ -83,7 +82,7 @@ mod test {
         error::SphinxInvError,
         priority::SphinxPriority,
         roles::PyRole,
-        writers::{PlainTextSphinxInventoryWriter, SphinxInventoryWriter},
+        writers::{SphinxInventoryWriter, WriteFormat},
     };
 
     #[test]
@@ -93,7 +92,7 @@ mod test {
             "# Sphinx inventory version 2
 # Project: foo
 # Version: 0.24.24
-# The remainder of this file is compressed using zlib.
+# The remainder of this file is compressed using plain-text.
 str.join py:method 1 library/stdtypes.html#$ -
 str.lower py:method 1 library/stdtypes.html#$ -
 ",
@@ -121,14 +120,14 @@ str.lower py:method 1 library/stdtypes.html#$ -
             "-",
         );
 
-        let mut writer = PlainTextSphinxInventoryWriter::from_header(header, 2, true);
+        let mut writer = SphinxInventoryWriter::from_header(header, 2, true);
 
         writer.add_reference(str_join_ref);
         writer.add_reference(str_lower_ref);
 
         let mut cursor = Cursor::new(&mut write_buffer);
 
-        writer.finalize(&mut cursor)?;
+        writer.finalize(&mut cursor, &WriteFormat::Plain)?;
 
         assert_eq!(String::from_utf8(write_buffer).unwrap(), expected);
         Ok(())
@@ -140,7 +139,7 @@ str.lower py:method 1 library/stdtypes.html#$ -
             "# Sphinx inventory version 2
 # Project: foo
 # Version: 0.24.24
-# The remainder of this file is compressed using zlib.
+# The remainder of this file is compressed using plain-text.
 str.join py:method 1 library/stdtypes.html#str.join str.join
 str.lower py:method 1 library/stdtypes.html#str.lower str.lower
 ",
@@ -168,14 +167,14 @@ str.lower py:method 1 library/stdtypes.html#str.lower str.lower
             "-",
         );
 
-        let mut writer = PlainTextSphinxInventoryWriter::from_header(header, 2, false);
+        let mut writer = SphinxInventoryWriter::from_header(header, 2, false);
 
         writer.add_reference(str_join_ref);
         writer.add_reference(str_lower_ref);
 
         let mut cursor = Cursor::new(&mut write_buffer);
 
-        writer.finalize(&mut cursor)?;
+        writer.finalize(&mut cursor, &WriteFormat::Plain)?;
 
         assert_eq!(String::from_utf8(write_buffer).unwrap(), expected);
         Ok(())
@@ -189,7 +188,7 @@ str.lower py:method 1 library/stdtypes.html#str.lower str.lower
             project_name: "foo".to_string(),
             project_version: "0.24.24".to_string(),
             inventory_version: 2,
-            compression_method_description: "zlib".to_string(),
+            compression_method_description: "plain-text".to_string(),
         };
 
         let str_lower_ref = SphinxReference::new(
@@ -211,13 +210,13 @@ str.lower py:method 1 library/stdtypes.html#str.lower str.lower
 
         writer.add_reference(str_join_ref.clone());
         writer.add_reference(str_lower_ref.clone());
-        writer.finalize(&mut cursor)?;
+        writer.finalize(&mut cursor, &WriteFormat::Plain)?;
 
         cursor.set_position(0);
 
         let mut reader = SphinxInventoryReader::from_reader(cursor)?;
 
-        assert_eq!(reader.header().clone(), header);
+        assert_eq!(reader.header(), &header);
 
         assert_eq!(reader.next().unwrap()?, str_join_ref);
 

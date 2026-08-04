@@ -2,7 +2,7 @@ use std::fmt::Display;
 use std::io::BufRead;
 
 use winnow::ascii::space0;
-use winnow::combinator::{eof, terminated};
+use winnow::combinator::{alt, eof, terminated};
 use winnow::prelude::*;
 use winnow::stream::AsChar;
 use winnow::token::{take_till, take_while};
@@ -31,12 +31,12 @@ pub struct InventoryHeader {
 }
 
 impl InventoryHeader {
-    pub fn new(name: &str, version: &str) -> Self {
+    pub fn new(name: &str, version: &str, compression: &str) -> Self {
         InventoryHeader {
             project_name: name.to_string(),
             project_version: version.to_string(),
             inventory_version: 2,
-            compression_method_description: "zlib".to_string(),
+            compression_method_description: compression.to_string(),
         }
     }
 }
@@ -49,7 +49,10 @@ impl Display for InventoryHeader {
         ))?;
         f.write_str(&format!("# Project: {}\n", self.project_name))?;
         f.write_str(&format!("# Version: {}\n", self.project_version))?;
-        f.write_str("# The remainder of this file is compressed using zlib.\n")?;
+        f.write_str(&format!(
+            "# The remainder of this file is compressed using {}.\n",
+            self.compression_method_description
+        ))?;
         Ok(())
     }
 }
@@ -124,9 +127,18 @@ fn parse_compression_method(buffer: &mut &[u8]) -> WinnowResult<String> {
     // this is how sphinx itself does it even if it's a bit silly
     trace(
         "compression description",
-        terminated(preceded(take_until(0.., "zlib"), "zlib"), rest)
-            .context(StrContext::Label("compression method"))
-            .context(StrContext::Expected(StrContextValue::StringLiteral("zlib"))),
+        terminated(
+            alt((
+                preceded(take_until(0.., "zlib"), "zlib"),
+                preceded(take_until(0.., "plain-text"), "plain-text"),
+            )),
+            rest,
+        )
+        .context(StrContext::Label("compression method"))
+        .context(StrContext::Expected(StrContextValue::StringLiteral("zlib")))
+        .context(StrContext::Expected(StrContextValue::StringLiteral(
+            "plain-text",
+        ))),
     )
     .parse_to()
     .verify(|c: &str| !c.is_empty())
@@ -269,7 +281,7 @@ mod test {
             result,
             Err(SphinxInvError::ParseError(SphinxParseError::from_str(
                 "# The remainder of this file is compressed using my butt.",
-                "invalid compression method\nexpected `zlib`",
+                "invalid compression method\nexpected `zlib`, `plain-text`",
                 0,
                 4
             )))
@@ -373,7 +385,7 @@ mod test {
                 inventory_version: 2,
                 compression_method_description: "zlib".to_string()
             },
-            InventoryHeader::new("foo", "0.24.24")
+            InventoryHeader::new("foo", "0.24.24", "zlib")
         );
     }
 }
