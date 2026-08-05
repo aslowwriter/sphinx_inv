@@ -10,7 +10,7 @@ pub enum SphinxInvError {
     IoError(#[from] std::io::Error),
 
     /// Errors while parsing Sphinx input (can be either during header or record parsing)
-    #[error("Parse error: {0}")]
+    #[error(transparent)]
     ParseError(#[from] SphinxParseError),
 
     /// Errors when there is not enough input to correctly parse a header, note that
