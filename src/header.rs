@@ -210,10 +210,6 @@ pub fn parse_header<R: BufRead>(reader: &mut R) -> Result<InventoryHeader, Sphin
     Ok(header)
 }
 
-// fn fmt_context_error(input: &str, err: &ContextError) -> String {
-//     format!("failed to parse line: {input} because of the following error: {err:#?}")
-// }
-
 #[cfg(test)]
 mod test {
     use crate::{error::SphinxInvError, header::MissingHeaderComponent};
