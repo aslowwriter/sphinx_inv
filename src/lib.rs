@@ -82,7 +82,9 @@
 //!
 //! // add_reference on it's own only adds it to the internal buffer
 //! // nothing actually happens until you call [`SphinxInventoryWriter::finalize`]
-//! writer.finalize(&mut cursor, &WriteFormat::Plain, true).unwrap();
+//! writer
+//!     .finalize(&mut cursor, &WriteFormat::Plain, true)
+//!     .unwrap();
 //!
 //! let written = String::from_utf8(cursor.into_inner()).unwrap();
 //!

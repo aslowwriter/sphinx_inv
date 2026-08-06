@@ -34,12 +34,13 @@ impl Display for HttpRole {
     }
 }
 
-/// Parses a cpp role as defined in [`HttpRole`]
+/// Parses a http role as defined in [`HttpRole`]
 /// may not contain whitespace but may contain other colons
 pub(crate) fn http_role(input: &mut &str) -> ModalResult<SphinxType> {
     let role = take_till(1.., AsChar::is_space)
         .context(StrContext::Label("http role"))
         .parse_to::<HttpRole>()
+        .context(StrContext::Label("expected valid http role"))
         .parse_next(input)?;
     Ok(SphinxType::Http(role))
 }
