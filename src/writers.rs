@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::io::{BufWriter, Write};
 
 use flate2::{Compression, write::ZlibEncoder};
 
@@ -28,39 +28,39 @@ impl SphinxInventoryWriter {
     }
 
     pub fn finalize<W: Write>(
-        self,
+        mut self,
         writer: &mut W,
         format: &WriteFormat,
         minimize: bool,
     ) -> Result<(), std::io::Error> {
-        let mut write_header = self.header.clone();
-        write_header.compression_method_description = match format {
+        let mut writer = BufWriter::new(writer);
+        self.header.compression_method_description = match format {
             WriteFormat::Plain => "plain-text".to_string(),
             WriteFormat::Zlib => "zlib".to_string(),
         };
-        writer.write_all(format!("{write_header}").as_bytes())?;
-        writer.flush()?;
+        writer.write_all(self.header.to_string().as_bytes())?;
         match format {
             WriteFormat::Plain => {
-                for reference in self.buffer {
-                    if minimize {
-                        writer.write_all(format!("{}\n", reference.fmt_minified()).as_bytes())?;
-                    } else {
-                        writer.write_all(format!("{}\n", reference.fmt_expanded()).as_bytes())?;
+                if minimize {
+                    for reference in self.buffer {
+                        writeln!(writer, "{}", reference.fmt_minified())?;
+                    }
+                } else {
+                    for reference in self.buffer {
+                        writeln!(writer, "{}", reference.fmt_expanded())?;
                     }
                 }
-                writer.flush()?;
                 Ok(())
             }
             WriteFormat::Zlib => {
                 let mut zlib_writer = ZlibEncoder::new(writer, Compression::fast());
-                for reference in self.buffer {
-                    if minimize {
-                        zlib_writer
-                            .write_all(format!("{}\n", reference.fmt_minified()).as_bytes())?;
-                    } else {
-                        zlib_writer
-                            .write_all(format!("{}\n", reference.fmt_expanded()).as_bytes())?;
+                if minimize {
+                    for reference in self.buffer {
+                        writeln!(zlib_writer, "{}", reference.fmt_minified())?;
+                    }
+                } else {
+                    for reference in self.buffer {
+                        writeln!(zlib_writer, "{}", reference.fmt_expanded())?;
                     }
                 }
                 zlib_writer.finish()?;
