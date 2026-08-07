@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0](https://github.com/aslowwriter/sphinx_inv/compare/v0.3.0...v0.4.0) - 2026-08-07
+
+### Added
+
+- move minimized in writer to finalized call
+- combine plainext and base structs
+- make references cloneable
+- add hyperfine benchmark
+
+### Fixed
+
+- *(err)* make parse error transparent
+
+### Other
+
+- *(roles)* fix mistake in comment
+- *(writer)* optimise write loop
+- remove stray commented out code
+- add list of known inventory files
+- document rest of the std roles
+- document SIP roles
+- document the rest of the rst roles
+- document the python roles
+- document the role subcrate
+- document c++ domain
+- document cmake domain
+- document reference struct
+- document priority enum
+- fix formatting in root lib docs
+- document error enums and structs
+- add just command to measure doc coverage
+- *(deps)* bump actions/checkout from 6 to 7
+- *(deps)* bump codecov/codecov-action from 6 to 7
+
 ## [0.3.0](https://github.com/aslowwriter/sphinx_inv/compare/v0.2.0...v0.3.0) - 2026-05-07
 
 ### Fixed
